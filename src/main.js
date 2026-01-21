@@ -36,8 +36,9 @@ function renderHome() {
     card.className = 'story-card'
     Object.assign(card.style, {
       background: 'var(--color-surface)',
-      padding: '1.5rem',
+      padding: '0',
       borderRadius: '8px',
+      overflow: 'hidden',
       border: '1px solid #333',
       cursor: 'pointer',
       transition: 'transform 0.3s ease, border-color 0.3s ease'
@@ -56,14 +57,17 @@ function renderHome() {
     }
 
     card.innerHTML = `
-      <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">${story.title}</h2>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem; color: var(--color-text-dim);">
-        <span>${story.author}</span>
-        <span>${story.date}</span>
-      </div>
-      <p style="margin-bottom: 1.5rem; color: #bbb;">${story.summary}</p>
-      <div>
-        ${story.tags.map(tag => `<span style="display: inline-block; background: #222; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 5px; color: var(--color-accent); border: 1px solid #444;">#${tag}</span>`).join('')}
+      ${story.imageUrl ? `<img src="${story.imageUrl}" alt="${story.title}" style="width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid #333; margin-bottom: 1rem; filter: grayscale(50%) contrast(120%);">` : ''}
+      <div style="padding: 0 1rem 1rem 1rem;">
+        <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; margin-top: 0.5rem;">${story.title}</h2>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem; color: var(--color-text-dim);">
+          <span>${story.author}</span>
+          <span>${story.date}</span>
+        </div>
+        <p style="margin-bottom: 1.5rem; color: #bbb;">${story.summary}</p>
+        <div>
+          ${story.tags.map(tag => `<span style="display: inline-block; background: #222; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 5px; color: var(--color-accent); border: 1px solid #444;">#${tag}</span>`).join('')}
+        </div>
       </div>
     `
 
@@ -94,10 +98,11 @@ function renderStory(storyId) {
   const content = document.createElement('article')
   content.style.marginTop = '3rem'
   content.innerHTML = `
-    <h1 style="text-align: left; font-size: 3rem;">${story.title}</h1>
+    <h1 style="text-align: left; font-size: 3rem; margin-bottom: 0.5rem;">${story.title}</h1>
     <div style="border-bottom: 1px solid var(--color-accent); padding-bottom: 1rem; margin-bottom: 2rem; color: var(--color-text-dim);">
       By ${story.author} • ${story.date}
     </div>
+    ${story.imageUrl ? `<img src="${story.imageUrl}" alt="${story.title}" style="width: 100%; max-height: 400px; object-fit: cover; border: 1px solid var(--color-accent); box-shadow: var(--shadow-glow); margin-bottom: 2rem; filter: sepia(30%);">` : ''}
     <div class="story-body" style="font-size: 1.2rem; line-height: 1.8; color: #ddd;">
       ${story.content}
     </div>
@@ -115,7 +120,31 @@ function render() {
   } else if (state.view === 'story') {
     app.appendChild(renderStory(state.currentStoryId))
   }
+
+  // Lightbox Container
+  const lightbox = document.createElement('div')
+  lightbox.id = 'lightbox'
+  lightbox.innerHTML = `
+    <span id="lightbox-close">&times;</span>
+    <img id="lightbox-img" src="" alt="Full Screen">
+  `
+  lightbox.onclick = (e) => {
+    if (e.target !== document.getElementById('lightbox-img')) {
+      lightbox.classList.remove('active')
+    }
+  }
+  app.appendChild(lightbox)
 }
+
+// Global Image Click Handler for Lightbox
+document.addEventListener('click', (e) => {
+  if (e.target.tagName === 'IMG' && !e.target.id.includes('lightbox')) {
+    const lightbox = document.getElementById('lightbox')
+    const lightboxImg = document.getElementById('lightbox-img')
+    lightboxImg.src = e.target.src
+    lightbox.classList.add('active')
+  }
+})
 
 // Initial Render
 render()
