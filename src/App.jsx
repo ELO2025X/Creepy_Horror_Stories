@@ -71,6 +71,7 @@ const BackroomsView = ({ onExit }) => {
     const [audioEnabled, setAudioEnabled] = useState(false);
     const [status, setStatus] = useState("Exploring Level 0");
     const audioRef = useRef(null);
+    const sanityRef = useRef(100);
 
     // Maze Configuration (1 = Wall, 0 = Path)
     const mazeGrid = [
@@ -90,18 +91,49 @@ const BackroomsView = ({ onExit }) => {
     useEffect(() => {
         if (!containerRef.current) return;
 
+        const textureLoader = new THREE.TextureLoader();
+        console.log("Starting texture load...");
+
+        const wallTexture = textureLoader.load(
+            '/Creepy_Horror_Stories/images/wallpaper.png',
+            () => console.log("Wallpaper loaded successfully"),
+            undefined,
+            (err) => console.error("Error loading wallpaper:", err)
+        );
+        const carpetTexture = textureLoader.load(
+            '/Creepy_Horror_Stories/images/carpet.png',
+            () => console.log("Carpet loaded successfully"),
+            undefined,
+            (err) => console.error("Error loading carpet:", err)
+        );
+
+        // Fix texture wrapping
+        wallTexture.wrapS = THREE.RepeatWrapping;
+        wallTexture.wrapT = THREE.RepeatWrapping;
+        carpetTexture.wrapS = THREE.RepeatWrapping;
+        carpetTexture.wrapT = THREE.RepeatWrapping;
+
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a00);
-        scene.fog = new THREE.FogExp2(0x1a1a00, 0.1);
+        scene.fog = new THREE.FogExp2(0x1a1a00, 0.02); // Dark fog
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        // Force style to ensure visibility behind HUD
+        renderer.domElement.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%;';
         containerRef.current.appendChild(renderer.domElement);
+        console.log("Renderer appended to DOM with forced styles");
 
         // Materials
-        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xc2b280, roughness: 0.8 });
-        const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x8b8b00, roughness: 1 });
+        const wallMaterial = new THREE.MeshStandardMaterial({
+            map: wallTexture,
+            color: 0xcccccc
+        });
+        const floorMaterial = new THREE.MeshStandardMaterial({
+            map: carpetTexture,
+            color: 0x999999
+        });
         const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
 
         // Build Maze
@@ -109,6 +141,7 @@ const BackroomsView = ({ onExit }) => {
         const wallGeometry = new THREE.BoxGeometry(cellSize, 6, cellSize);
         const floorGeometry = new THREE.PlaneGeometry(cellSize, cellSize);
 
+        let objectCount = 0;
         mazeGrid.forEach((row, r) => {
             row.forEach((cell, c) => {
                 const x = c * cellSize;
@@ -119,37 +152,51 @@ const BackroomsView = ({ onExit }) => {
                 floor.rotation.x = -Math.PI / 2;
                 floor.position.set(x, -3, z);
                 mazeGroup.add(floor);
+                objectCount++;
 
                 const ceiling = new THREE.Mesh(floorGeometry, ceilingMaterial);
                 ceiling.rotation.x = Math.PI / 2;
                 ceiling.position.set(x, 3, z);
                 mazeGroup.add(ceiling);
+                objectCount++;
 
                 // Walls
                 if (cell === 1) {
                     const wall = new THREE.Mesh(wallGeometry, wallMaterial);
                     wall.position.set(x, 0, z);
                     mazeGroup.add(wall);
+                    objectCount++;
                 }
             });
         });
         scene.add(mazeGroup);
+        console.log(`Maze built with ${objectCount} objects`);
+        console.log("Total objects in scene:", scene.children.length);
 
         // Lights
         const lights = [];
         mazeGrid.forEach((row, r) => {
             row.forEach((cell, c) => {
                 if (cell === 0 && Math.random() > 0.7) {
-                    const pLight = new THREE.PointLight(0xffffcc, 2.5, 20); // Increased intensity & range
-                    pLight.position.set(c * cellSize, 3, r * cellSize);
+                    const pLight = new THREE.PointLight(0xffffcc, 1.5, 25);
+                    pLight.position.set(c * cellSize, 1.5, r * cellSize);
                     scene.add(pLight);
                     lights.push(pLight);
                 }
             });
         });
 
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.8); // Brighter ambient
+        // Ambient light (low intensity for horror vibe)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
         scene.add(ambientLight);
+
+        // Flashlight (attached to camera)
+        const flashlight = new THREE.SpotLight(0xffffff, 2, 40, Math.PI / 4, 0.5, 1);
+        flashlight.position.set(0, 0, 0);
+        flashlight.target.position.set(0, 0, -1);
+        camera.add(flashlight);
+        camera.add(flashlight.target);
+        scene.add(camera);
 
         // Entity (The Watcher)
         const entityGeo = new THREE.BoxGeometry(1, 4, 1);
@@ -158,6 +205,7 @@ const BackroomsView = ({ onExit }) => {
         scene.add(entity);
 
         camera.position.set(cellSize, 0, cellSize);
+        camera.lookAt(cellSize, 0, 0);
 
         // Controls
         let moveForward = false, moveBackward = false, turnLeft = false, turnRight = false;
@@ -180,18 +228,20 @@ const BackroomsView = ({ onExit }) => {
         let lastTime = performance.now();
         let blackoutTimer = 0;
         let entityTimer = 0;
+        let frameCount = 0;
 
         const animate = () => {
             const frameId = requestAnimationFrame(animate);
             const time = performance.now();
             const delta = (time - lastTime) / 1000;
             lastTime = time;
+            frameCount++;
 
             // Rotation
             if (turnLeft) camera.rotation.y += 2 * delta;
             if (turnRight) camera.rotation.y -= 2 * delta;
 
-            // Movement with Collision Detection
+            // Movement
             if (moveForward || moveBackward) {
                 const direction = new THREE.Vector3();
                 camera.getWorldDirection(direction);
@@ -199,8 +249,6 @@ const BackroomsView = ({ onExit }) => {
 
                 const nextX = camera.position.x + direction.x * 5 * delta;
                 const nextZ = camera.position.z + direction.z * 5 * delta;
-
-                // Grid check
                 const gridX = Math.round(nextX / cellSize);
                 const gridZ = Math.round(nextZ / cellSize);
 
@@ -210,23 +258,29 @@ const BackroomsView = ({ onExit }) => {
                 }
             }
 
+            // Sanity Decay (Logic)
+            sanityRef.current = Math.max(0, sanityRef.current - 0.5 * delta);
+
             // Random Events: Blackout
             if (blackoutTimer > 0) {
                 blackoutTimer -= delta;
                 lights.forEach(l => l.intensity = 0);
-                ambientLight.intensity = 0.05;
-                setSanity(s => Math.max(0, s - 0.2));
+                ambientLight.intensity = 0.01;
+                flashlight.intensity = 0;
+                sanityRef.current -= 5 * delta; // Heavy sanity loss in darkness
                 if (blackoutTimer <= 0) setStatus("Exploring Level 0");
             } else {
-                if (Math.random() > 0.998) {
+                if (Math.random() > 0.999) {
                     blackoutTimer = 3;
                     setStatus("LIGHTS FAILURE DETECTED");
                 }
                 lights.forEach(l => {
-                    if (Math.random() > 0.98) l.intensity = Math.random() * 1.5;
+                    // Flicker
+                    if (Math.random() > 0.95) l.intensity = Math.random() * 1.5;
                     else l.intensity = 1.2;
                 });
-                ambientLight.intensity = 0.3;
+                ambientLight.intensity = 0.1;
+                flashlight.intensity = 2 + Math.random() * 0.5; // Flashlight flicker
             }
 
             // Random Events: The Watcher
@@ -237,16 +291,21 @@ const BackroomsView = ({ onExit }) => {
                     entity.position.set(0, -10, 0);
                     setStatus("Exploring Level 0");
                 }
-            } else if (Math.random() > 0.999) {
+            } else if (Math.random() > 0.9995) {
                 const dir = new THREE.Vector3();
                 camera.getWorldDirection(dir);
-                const spawnPos = camera.position.clone().add(dir.multiplyScalar(25));
+                const spawnPos = camera.position.clone().add(dir.multiplyScalar(15));
                 entity.position.copy(spawnPos);
                 entityTimer = 2;
                 setStatus("NON-HUMAN ENTITY DETECTED");
+                sanityRef.current -= 10;
             }
 
-            setSanity(s => Math.max(0, s - 0.01 * delta * 10));
+            // Sync React State (Throttled)
+            if (frameCount % 30 === 0) {
+                setSanity(sanityRef.current);
+            }
+
             renderer.render(scene, camera);
         };
         const frameId = requestAnimationFrame(animate);
