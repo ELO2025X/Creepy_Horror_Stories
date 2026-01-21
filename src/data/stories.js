@@ -109,5 +109,27 @@ export const stories = [
       
       <p>I am the dead channel.</p>
     `
+  },
+  {
+    id: 'backrooms-zero',
+    title: 'The Beige Eternity',
+    author: 'Subject 9402',
+    date: 'Noclip Event +4 Days',
+    imageUrl: '/Creepy_Horror_Stories/images/backrooms.png',
+    summary: 'If you\'re not careful... you\'ll clip out of reality.',
+    tags: ['liminal', 'creepy-pasta', 'psychological'],
+    content: `
+      <p>I don't know how long I've been walking. Time doesn't work here. My watch stopped three days ago—or maybe three years ago—at 4:02 PM. The only constant is the Hum. That buzzing, insect-like drone of the fluorescent lights. It’s loud enough to feel in your teeth, a constant vibration that scrapes against your sanity.</p>
+      
+      <p>The smell is the worst part. It smells like wet carpet. Not fresh water, but stagnant, moldy water that has been trapped under synthetic fibers for a decade. It’s humid, clammy, and warm. Like the breath of a sickly animal.</p>
+      
+      <p>The walls are mono-yellow. A sickly, jaundice yellow that seems to pulse if you stare at it too long. There are no windows. No doors to the outside. Just endless, randomly segmented rooms. I’ve walked for miles in a straight line and ended up back where I started, or what looks like where I started. Every room is the same, but wrong. The outlets are in different places. The wallpaper patterns don't line up.</p>
+      
+      <p>Yesterday, I found a room with a chair in the center. A simple, wooden chair. I sat down to rest, and the chair felt... soft. Warm. Like flesh. I stood up and saw a bruise forming on the wood where I had touched it.</p>
+      
+      <p>And now, I hear it. Heavy, wet footsteps. Slapping against the moist carpet. They aren't coming from behind me. They're coming from the walls. I put my ear to the wallpaper. I heard breathing. Slow, ragged breathing on the other side of the plaster.</p>
+      
+      <p>The lights just flickered. They stayed off for a full second this time. When they came back on, the hallway had changed. It’s longer now. And at the very end... something is standing there. It has no face. Just a smooth patch of skin where eyes should be. And it's waving at me.</p>
+    `
   }
 ];
