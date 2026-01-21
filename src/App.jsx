@@ -140,15 +140,15 @@ const BackroomsView = ({ onExit }) => {
         mazeGrid.forEach((row, r) => {
             row.forEach((cell, c) => {
                 if (cell === 0 && Math.random() > 0.7) {
-                    const pLight = new THREE.PointLight(0xffffcc, 1.2, 15);
-                    pLight.position.set(c * cellSize, 2.5, r * cellSize);
+                    const pLight = new THREE.PointLight(0xffffcc, 2.5, 20); // Increased intensity & range
+                    pLight.position.set(c * cellSize, 3, r * cellSize);
                     scene.add(pLight);
                     lights.push(pLight);
                 }
             });
         });
 
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.8); // Brighter ambient
         scene.add(ambientLight);
 
         // Entity (The Watcher)
@@ -380,7 +380,7 @@ export default function App() {
             <nav className="fixed top-0 left-0 w-full bg-black/90 border-b border-red-900/30 backdrop-blur-md z-40 p-4 flex justify-between items-center px-8">
                 <div className="flex items-center gap-3">
                     <Ghost className="text-red-600 w-8 h-8 animate-pulse" />
-                    <h1 className="text-2xl font-black uppercase tracking-tighter text-red-600">The Void Archive</h1>
+                    <h1 className="text-2xl font-black uppercase tracking-tighter text-red-600 font-header">The Void Archive</h1>
                 </div>
                 <div className="flex gap-6 text-sm uppercase tracking-widest text-gray-500 font-sans">
                     <span className="hover:text-red-500 cursor-pointer transition-colors">Documents</span>
@@ -436,32 +436,46 @@ export default function App() {
                             <div
                                 key={story.id}
                                 onClick={() => setActiveId(story.id)}
-                                className="group relative bg-[#0a0a0a] border border-gray-800 p-8 cursor-pointer overflow-hidden transition-all hover:border-red-600/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)]"
+                                className="group relative bg-[#0a0a0a] border border-gray-800 p-0 cursor-pointer overflow-hidden transition-all hover:border-red-600/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] rounded-lg"
                             >
-                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity">
-                                    {story.is3D ? <Eye className="w-8 h-8 text-red-600" /> : <Skull className="w-8 h-8 text-gray-700" />}
-                                </div>
-
-                                <h3 className="text-2xl font-bold mb-3 text-gray-200 group-hover:text-red-500 transition-colors uppercase tracking-tight">
-                                    {story.title}
-                                </h3>
-                                <p className="text-gray-500 text-sm mb-6 leading-relaxed line-clamp-2">
-                                    {story.summary}
-                                </p>
-
-                                <div className="flex flex-wrap gap-2">
-                                    {story.tags.map(tag => (
-                                        <span key={tag} className="text-[10px] uppercase tracking-widest bg-gray-900 px-2 py-1 text-gray-500 border border-gray-800">
-                                            #{tag}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                {story.is3D && (
-                                    <div className="mt-4 flex items-center gap-2 text-[10px] text-red-600 font-bold uppercase animate-pulse">
-                                        <Info className="w-3 h-3" /> Interactive simulation available
+                                {/* Story Image */}
+                                {story.imageUrl && (
+                                    <div className="w-full h-48 overflow-hidden relative border-b border-gray-800 group-hover:border-red-900/30 transition-colors">
+                                        <img
+                                            src={story.imageUrl}
+                                            alt={story.title}
+                                            className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 filter grayscale group-hover:grayscale-0"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
                                     </div>
                                 )}
+
+                                <div className="p-8 relative">
+                                    <div className="absolute top-4 right-4 opacity-20 group-hover:opacity-100 transition-opacity z-10">
+                                        {story.is3D ? <Eye className="w-6 h-6 text-red-600" /> : <Skull className="w-6 h-6 text-gray-700" />}
+                                    </div>
+
+                                    <h3 className="text-2xl font-bold mb-3 text-gray-200 group-hover:text-red-500 transition-colors uppercase tracking-tight font-header">
+                                        {story.title}
+                                    </h3>
+                                    <p className="text-gray-500 text-sm mb-6 leading-relaxed line-clamp-2 font-serif">
+                                        {story.summary}
+                                    </p>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {story.tags.map(tag => (
+                                            <span key={tag} className="text-[10px] uppercase tracking-widest bg-gray-900 px-2 py-1 text-gray-500 border border-gray-800">
+                                                #{tag}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    {story.is3D && (
+                                        <div className="mt-4 flex items-center gap-2 text-[10px] text-red-600 font-bold uppercase animate-pulse">
+                                            <Info className="w-3 h-3" /> Interactive simulation available
+                                        </div>
+                                    )}
+                                </div>
 
                                 <div className="absolute bottom-0 left-0 w-full h-1 bg-red-900 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                             </div>

@@ -7,6 +7,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
+                header: ['"Creepster"', 'system-ui'],
                 serif: ['"Roboto Slab"', 'serif'],
                 mono: ['monospace'],
             },
