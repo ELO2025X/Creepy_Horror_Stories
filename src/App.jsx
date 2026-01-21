@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Ghost, Skull, Eye, Volume2, VolumeX, AlertCircle, ArrowLeft, Move, Info } from 'lucide-react';
 
@@ -68,7 +69,6 @@ const BackroomsView = ({ onExit }) => {
     const containerRef = useRef();
     const [sanity, setSanity] = useState(100);
     const [audioEnabled, setAudioEnabled] = useState(false);
-    const [libLoaded, setLibLoaded] = useState(false);
     const [status, setStatus] = useState("Exploring Level 0");
     const audioRef = useRef(null);
 
@@ -87,22 +87,9 @@ const BackroomsView = ({ onExit }) => {
     ];
     const cellSize = 10;
 
-    // Dynamic Library Loading
     useEffect(() => {
-        if (window.THREE) {
-            setLibLoaded(true);
-            return;
-        }
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-        script.onload = () => setLibLoaded(true);
-        document.head.appendChild(script);
-    }, []);
+        if (!containerRef.current) return;
 
-    useEffect(() => {
-        if (!libLoaded || !containerRef.current || !window.THREE) return;
-
-        const THREE = window.THREE;
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a00);
         scene.fog = new THREE.FogExp2(0x1a1a00, 0.1);
@@ -280,7 +267,7 @@ const BackroomsView = ({ onExit }) => {
                 containerRef.current.removeChild(renderer.domElement);
             }
         };
-    }, [libLoaded]);
+    }, []);
 
     const toggleAudio = () => {
         if (!audioEnabled) {
@@ -317,14 +304,6 @@ const BackroomsView = ({ onExit }) => {
 
     return (
         <div className="relative w-full h-screen bg-black overflow-hidden font-mono text-yellow-500">
-            {!libLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black z-50">
-                    <div className="text-center">
-                        <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                        <p className="uppercase tracking-[0.3em] text-xs">Calibrating Noclip Coords...</p>
-                    </div>
-                </div>
-            )}
             <div ref={containerRef} className="w-full h-full" />
 
             {/* HUD Overlay */}
