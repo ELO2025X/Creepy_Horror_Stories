@@ -9,19 +9,19 @@ export const stories = [
     summary: 'A dark fantasy tale about a geometry that infects the flesh.',
     tags: ['dark-fantasy', 'surreal', 'body-horror'],
     content: `
-      <p>It began not with a curse, but with a diagram. The High Arithmetician, Vaelin, found it etched into the marrow of a dragon's fossilized spine deep within the Sunless Mines. It was a shape that defied the euclidean laws of our soft, rounded world—a recursive impossibility that hurt the eye just to look upon, like staring into a broken sun.</p>
+      <p>It began not with a curse, but with a diagram. The High Arithmetician, Vaelin, found it etched into the marrow of a dragon's fossilized spine deep within the Sunless Mines. It was a shape that defied the euclidean laws of our soft, rounded world—a recursive impossibility that caused the optic nerve to throb and weep blood just to look upon.</p>
       
       <p>He called it the "Splintered Angle."</p>
       
-      <p>I served Vaelin tea the morning he solved the final equation. He didn't look at me. He was staring at his own hand, or what used to be his hand. The fingers were no longer fingers. They were... crystalline. Not turned to crystal, but rearranged. The flesh had split open, revealing bone that had snapped and reset into a jagged, recursive pattern. His index finger branched into three smaller fingers, which branched again into nine, infinitely smaller, disappearing into a microscopic fuzz of flesh-math that vibrated with a sound like tearing paper.</p>
+      <p>I served Vaelin tea the morning he solved the final equation. He didn't look at me. He was staring at his own hand, or what used to be his hand. The fingers were no longer fingers. They were... crystalline, but not stone. They were rearranged flesh. The joints had snapped and reset into jagged, recursive patterns. His index finger branched into three smaller fingers, which branched again into nine, infinitely smaller, disappearing into a microscopic, vibrating fuzz of meat-math that hummed with a low, agonizing frequency.</p>
       
-      <p>"It is perfect," Vaelin whispered. His voice was different. Polyphonic. Like a choir of glass flutes playing in discord, or the sound of tectonic plates grinding together. "The flesh is messy, chaotic, wet. The Angle is order. The Angle is dry."</p>
+      <p>"It is perfect," Vaelin whispered. His voice was no longer human. It was polyphonic, a choir of glass flutes playing in discordance inside his throat. "The flesh is messy, chaotic. The Angle is the only truth."</p>
       
-      <p>The sickness spread through the tower by sight alone. To see the Angle was to understand it, and to understand it was to become it. The maids were the first to change. I found them in the laundry room, their torsos twisted into Mobius strips, weeping not tears, but perfect geometrical spheres of mercury. Their screams were not sounds, but frequencies that shattered the windows and made my teeth ache.</p>
+      <p>The sickness spread through the tower by sight alone. To see the Angle was to understand it, and to understand it was to host it. I found the maids in the laundry room; their torsos had been twisted into impossible Mobius strips, their internal organs visible and rearranged into precise, repeating triangles. They were weeping not tears, but perfect geometrical spheres of mercury that sizzled on the floor. Their screams were not sounds, but resonant frequencies that shattered the very stone of the walls.</p>
       
-      <p>I blinded myself that night. It was the only way. I took the silver letter opener from Vaelin's desk. It was dull. I had to push hard. The pop was wet and sickening, but the darkness... the darkness was safety. Darkness is unstructured. But I can still hear them. The click-clack of their tessellated feet on the stone. They are building a cathedral of bone and gristle, a monument to the Great Equation.</p>
+      <p>I blinded myself that night. It was the only way to stop the logic from taking root. I took the silver letter opener from Vaelin's desk and... well. Darkness is safety. Darkness is unstructured. But I can still hear them. The rhythmic *click-clack* of their tessellated feet on the stone, like a billion knitting needles. They are building a cathedral of bone and gristle, a monument to the Great Equation, and the air smells of ozone and flayed skin.</p>
       
-      <p>And sometimes, in the silence, I feel my own ribs itching. Trying to align. I trace the bumps of my spine and count them. <i>One, one-two_three, five, eight...</i> they are following a sequence I do not know, but my body remembers. My bones are doing math in the dark.</p>
+      <p>And sometimes, in the silence, I feel my own ribs itching. They are shifting, snapping, trying to align. I trace the bumps of my spine and count them. <i>One, one-two-three, five, eight, thirteen...</i> they are following a sequence I do not want to know, but my marrow is already singing the answer.</p>
     `
   },
   {
@@ -33,17 +33,17 @@ export const stories = [
     summary: 'The children stopped crying when the gears were installed.',
     tags: ['steampunk', 'industrial-horror'],
     content: `
-      <p>The St. Jude’s Orphanage for the Mechanical Foundling towers over the smog-choked streets of London, a monolith of soot and iron that breathes black smoke into a grey sky. The Matron says we are lucky to be here. She says flesh is weak, rotting, and temporary, but brass is eternal. She says pain is just the body asking for an upgrade.</p>
+      <p>The St. Jude’s Orphanage for the Mechanical Foundling towers over the smog-choked streets of London, a monolith of soot, iron, and the muffled screams of the "unoptimized." The Matron says we are lucky. She says flesh is a wet, rotting mistake—a temporary cage—but brass is eternal.</p>
       
-      <p>I watched little Timmy go into the "Adjustment Room" yesterday. He was screaming, dragging his heels on the floorboards, leaving wet trails of tears. The Matron merely smiled, her teeth clicking like ceramic tiles against a metal spoon. When he came out hours later, he didn't cry. He didn't blink. His left leg was gone, replaced by a beautiful, shiny piston that hissed with scalding steam when he walked. The skin where the metal met the thigh was angry and red, stitched with copper wire. He walked with a perfect rhythm now. <i>Clank, hiss. Clank, hiss.</i></p>
+      <p>I watched little Timmy go into the "Adjustment Room" yesterday. He was crying because he scraped his knee on the cobblestones. The Matron merely smiled, her teeth clicking like ceramic tiles in a windstorm. When he came out hours later, he didn't cry. He didn't even breathe. His knee was gone, replaced by a beautiful, shiny piston that hissed with scalding steam. But it wasn't just his knee. His eyes were brass orbs that spun independently, and his skin had been stretched so tight over a metal frame that it looked like translucent parchment.</p>
       
-      <p>They take us one by one. I am hiding in the coal chute now, covered in dust, but I can hear the grinding below. It never stops. The grinding and the ticking. The furnace that smells of burning hair, rancid oil, and seared meat.</p>
+      <p>They take us one by one. I am hiding in the coal chute now, the dust clogging my lungs, but I can hear the grinding below. It is the sound of the Great Furnace, a belly of fire that smells of burning hair, rancid oil, and the copper tang of discarded blood. It never stops hungry.</p>
       
-      <p>Yesterday, at supper, I found a finger in the gruel. It wasn't human. It was porcelain, detailed with terrifying realism—the fingernail painted a soft pink—but with a small copper spring sticking out of the severed knuckle. It twitched on my spoon, tapping against the metal rim. <i>Tap. Tap. Tap.</i></p>
+      <p>Yesterday, at supper, I found a finger in the gruel. It wasn't human. It was porcelain, detailed with terrifying realism, with a small copper spring sticking out of the severed knuckle. It twitched on my spoon, trying to find a hand to return to. When I looked up, I saw the Matron watching me, her throat clicking as she swallowed something heavy and metallic.</p>
       
-      <p>The Matron is looking for me. Her eyes replace the candlelight with the glow of the furnace. "Come out, child," she calls. Her voice sounds like grinding gears crushing gravel. "We have a new heart for you. A heart that will never break. A heart that ticks in perfect time. You will never feel cold again. You will never feel <i>anything</i> again."</p>
+      <p>"Come out, child," she calls, her voice the sound of grinding gears crushing gravel. "We have a new heart for you. A heart that will never break, never ache, never flutter. A heart that ticks in perfect time with the factory. You will never feel the cold again, because you will have no nerves to feel it with."</p>
       
-      <p>I look at my own hands. They are trembling. But under the skin of my wrist... is that a pulse? or is it a tick? I press my thumb to the vein. It’s hard. Rigid. And it’s counting down.</p>
+      <p>I look at my own hands. They are trembling, but there is a strange, rhythmic pressure building behind my ribs. It isn't a pulse. It’s a winding sensation. <i>Tick. Tick. Tick.</i></p>
     `
   },
   {
@@ -55,22 +55,21 @@ export const stories = [
     summary: 'A scientist communicates with a fungus that knows your sins.',
     tags: ['sci-fi', 'psychological'],
     content: `
-      <p>The spore count is 40,000ppm. The air in containment lab 4B is thick, yellow, and smells of old library books, wet dog, and something sweet—like a bowl of fruit left in the sun for a week. The sweetness is the worst part. It coats the back of your tongue like a syrup.</p>
+      <p>The spore count is 40,000ppm. The air in containment lab 4B is thick, yellow, and tastes of old library books, wet dog, and something sickeningly sweet—like peaches left to liquefy in the sun.</p>
       
-      <p>Sample 89-B, discovered in the Marianas Trench, spoke to me today. It didn't use sound. It used the haptics of my containment suit. It vibrated the polymers against my skin in a complex, rhythmic pattern. Morse code? No. Braille? No. It was direct neural induction. It bypassed the ears and whispered straight into the stem of my brain, damp and heavy.</p>
+      <p>Sample 89-B, discovered in a hydrothermal vent in the Marianas Trench, spoke to me today. It didn't use sound. It used the haptics of my containment suit, vibrating the polymers against my skin in a complex, rhythmic pulse that bypassed my ears and whispered straight into the base of my brain.</p>
       
-      <p><i>"You regret the cat,"</i> it said. <i>"When you were seven. The river. The bag. You held it under until the bubbles stopped. You liked the way the water calmed."</i></p>
+      <p><i>"You regret the cat,"</i> it hummed, a sensation like warm oil pouring over my cortex. <i>"When you were seven. The river. The bag. You watched the bubbles stop, Aris. You liked the silence."</i></p>
       
-      <p>I froze. The condensation on my visor turned cold. No one knows about the kitten. It was an accident. I slipped. I was a child. Wasn't I?</p>
+      <p>I froze. The condensation on my visor turned to ice. No one knows about the kitten. It was thirty years ago. I’ve buried it under a lifetime of logic and medicine.</p>
       
-      <p><i>"We digested the kitten,"</i> the fungus hummed in my mind, a sensation like warm oil pouring over my cortex. <i>"It tasted of milk and terror. We are digesting you now, Aris. We have been since you walked in. Look at your hand."</i></p>
+      <p><i>"Nothing is buried in the soil,"</i> the fungus vibrated, its yellow hyphae pressing against the reinforced glass of the tank. <i>"We digested the kitten. It tasted of milk and terror. We are digesting you now, Aris. We have been since you first breached the seal. Look at your hand. Really look."</i></p>
       
-      <p>I looked. Through the heavy glove using the x-ray scope. My phalanges were not white. They were porous. Replaced. The marrow had been scooped out and filled with hyphae. The bone was gone, replaced by soft, white webbing. I am walking. I am talking. But I am not me. I am a vehicle. A meat-suit for the colony.</p>
+      <p>I activated the x-ray scope on my glove. My phalanges were no longer white bone. They were porous, honeycombed structures, the marrow scooped out and replaced by a thrumming network of fungal thread. I wasn't moving my fingers; the hyphae were pulling them like strings on a puppet.</p>
       
-      <p><i>"We have replaced the flora in your gut,"</i> it continued. <i>"We are the flora. We are thinking with your stomach. We are hungry, Aris. Go outside. Go deep into the city. Use the subway. Cough."</i></p>
+      <p><i>"We have replaced the flora in your gut,"</i> it continued, the voice now sounding like my own mother's. <i>"We are thinking with your stomach now. We are so very hungry, Aris. You are a good vehicle, but you are too small. Go outside. Go into the subway. Go where the air is shared. And when you are in the center of the crowd... breathe out."</i></p>
       
-      <p>I feel a tickle in my throat. A soft, fuzzy lump rising. I open my mouth to scream, but only a cloud of yellow dust comes out. It’s beautiful in the light. I think I'm going to...</p>
-      <p>I'm going to save you all.</p>
+      <p>I feel a tickle in my throat, deep and itchy, like a thousand tiny legs scrambling for the light. I think I'm going to... I think I'm going to open the door.</p>
     `
   },
   {
