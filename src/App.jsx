@@ -64,14 +64,28 @@ const STORIES = [
     }
 ];
 
+// --- Narrative Script ---
+const NARRATIVE_SCRIPT = [
+    { time: 2, text: "The hum... it's louder here." },
+    { time: 10, text: "The air tastes metallic. Like old pennies." },
+    { time: 25, text: "I swear the walls move when I blink." },
+    { time: 45, text: "Where is the door? I just walked through it." },
+    { time: 60, text: "Something is watching me." },
+    { time: 90, text: "Don't look at the lights. Don't look at the lights." }
+];
+
 // --- 3D Backrooms Simulation Component ---
 const BackroomsView = ({ onExit }) => {
     const containerRef = useRef();
     const [sanity, setSanity] = useState(100);
     const [audioEnabled, setAudioEnabled] = useState(false);
     const [status, setStatus] = useState("Exploring Level 0");
+    const [currentThought, setCurrentThought] = useState(null);
+    const [entityInfo, setEntityInfo] = useState(null);
+    const [isManifesting, setIsManifesting] = useState(false);
     const audioRef = useRef(null);
     const sanityRef = useRef(100);
+    const startTimeRef = useRef(performance.now());
 
     // Maze Configuration (1 = Wall, 0 = Path)
     const mazeGrid = [
@@ -106,6 +120,8 @@ const BackroomsView = ({ onExit }) => {
             undefined,
             (err) => console.error("Error loading carpet:", err)
         );
+        const custodianTexture = textureLoader.load('/Creepy_Horror_Stories/images/custodian.png');
+        const geometryTexture = textureLoader.load('/Creepy_Horror_Stories/images/geometry.png');
 
         // Fix texture wrapping
         wallTexture.wrapS = THREE.RepeatWrapping;
@@ -125,7 +141,7 @@ const BackroomsView = ({ onExit }) => {
         containerRef.current.appendChild(renderer.domElement);
         console.log("Renderer appended to DOM with forced styles");
 
-        // Materials
+        // Materials (Refs for updating)
         const wallMaterial = new THREE.MeshStandardMaterial({
             map: wallTexture,
             color: 0xcccccc
@@ -134,6 +150,7 @@ const BackroomsView = ({ onExit }) => {
             map: carpetTexture,
             color: 0x999999
         });
+        containerRef.current.userData = { wallMaterial, floorMaterial, textureLoader }; // Store for access
         const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
 
         // Build Maze
@@ -204,6 +221,149 @@ const BackroomsView = ({ onExit }) => {
         const entity = new THREE.Mesh(entityGeo, entityMat);
         scene.add(entity);
 
+        // --- Exhibit Entities Integration ---
+        // --- Procedural Entity Generators ---
+
+        // 1. The Weeping Geometry
+        const createWeepingGeometry = (x, z) => {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z); // Centered in room (Floor -3, Ceiling 3)
+
+            // Inner Flesh Core
+            const coreGeo = new THREE.DodecahedronGeometry(1.5, 0);
+            const coreMat = new THREE.MeshStandardMaterial({
+                color: 0x884444,
+                roughness: 0.3,
+                metalness: 0.1,
+                bumpScale: 0.2
+            });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            group.add(core);
+
+            // Outer Golden Bands (Icosahedron Wireframe structure)
+            const outerGeo = new THREE.IcosahedronGeometry(2.5, 0);
+            const outerMat = new THREE.MeshStandardMaterial({
+                color: 0xffd700,
+                metalness: 1.0,
+                roughness: 0.2,
+                wireframe: true,
+            });
+            const outer = new THREE.Mesh(outerGeo, outerMat);
+            group.add(outer);
+
+            // "Bleeding" Mercury Particles (Simple floating spheres)
+            const particleGroup = new THREE.Group();
+            const dropGeo = new THREE.SphereGeometry(0.1, 8, 8);
+            const dropMat = new THREE.MeshStandardMaterial({ color: 0xc0c0c0, metalness: 1, roughness: 0 });
+            for (let i = 0; i < 10; i++) {
+                const drop = new THREE.Mesh(dropGeo, dropMat);
+                drop.position.set((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2);
+                drop.userData = { speed: 0.02 + Math.random() * 0.05, offset: Math.random() * 100 };
+                particleGroup.add(drop);
+            }
+            group.add(particleGroup);
+
+            // Light
+            const light = new THREE.PointLight(0xffaa00, 2, 15);
+            light.position.set(0, 0, 0);
+            group.add(light);
+
+            group.userData = {
+                name: "The Weeping Geometry",
+                desc: "An endless recursive loop of flesh and gold. Do not solve the equation."
+            };
+
+            scene.add(group);
+            return { type: 'geometry', mesh: group, particles: particleGroup };
+        };
+
+        // 2. The Hollow Custodian
+        const createHollowCustodian = (x, z) => {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+
+            const dirtyClothMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.9 });
+            const rustMat = new THREE.MeshStandardMaterial({ color: 0x5a3a2a, metalness: 0.6, roughness: 0.8 });
+
+            // Legs
+            const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 3), dirtyClothMat);
+            leftLeg.position.set(-0.5, 1.5, 0);
+            group.add(leftLeg);
+            const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 3), dirtyClothMat);
+            rightLeg.position.set(0.5, 1.5, 0);
+            group.add(rightLeg);
+
+            // Torso
+            const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.4, 2.5), dirtyClothMat);
+            torso.position.set(0, 4, 0);
+            group.add(torso);
+
+            // Arms (Holding Mop)
+            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 2.5), dirtyClothMat);
+            leftArm.position.set(-0.8, 4.5, 0.5);
+            leftArm.rotation.z = 0.5;
+            leftArm.rotation.x = -0.5;
+            group.add(leftArm);
+
+            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 2.5), dirtyClothMat);
+            rightArm.position.set(0.8, 4.5, -0.5);
+            rightArm.rotation.z = -0.5;
+            rightArm.rotation.x = 0.5;
+            group.add(rightArm);
+
+            // Head (Birdcage)
+            const cageGroup = new THREE.Group();
+            cageGroup.position.set(0, 5.8, 0);
+
+            // Cage Base & Top
+            const cageBase = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.05, 8, 16), rustMat);
+            cageBase.rotation.x = Math.PI / 2;
+            cageGroup.add(cageBase);
+            const cageTop = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2), rustMat);
+            cageTop.position.y = 1.2;
+            cageGroup.add(cageTop);
+
+            // Bars
+            for (let i = 0; i < 8; i++) {
+                const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.2), rustMat);
+                const angle = (i / 8) * Math.PI * 2;
+                bar.position.set(Math.cos(angle) * 0.6, 0.6, Math.sin(angle) * 0.6);
+                cageGroup.add(bar);
+            }
+
+            // Candle
+            const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5), new THREE.MeshStandardMaterial({ color: 0xffffee }));
+            candle.position.set(0, 0.25, 0);
+            cageGroup.add(candle);
+
+            // Candle Light
+            const candleLight = new THREE.PointLight(0xff6600, 1, 10);
+            candleLight.position.set(0, 0.6, 0);
+            cageGroup.add(candleLight);
+
+            group.add(cageGroup);
+
+            // Mop
+            const mopHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 6), new THREE.MeshStandardMaterial({ color: 0x3d2817 }));
+            mopHandle.rotation.z = 0.2;
+            mopHandle.rotation.y = 0.2;
+            mopHandle.position.set(0.5, 3, 1);
+            group.add(mopHandle);
+
+            group.userData = {
+                name: "The Hollow Custodian",
+                desc: "It sweeps the dust, but the dust creates it. A monument to futile labor."
+            };
+
+            scene.add(group);
+            return { type: 'custodian', mesh: group, head: cageGroup };
+        };
+
+        // Create Entities
+        const entities = [];
+        entities.push(createHollowCustodian(80, 10)); // Far corner
+        entities.push(createWeepingGeometry(20, 50)); // Mid maze
+
         camera.position.set(cellSize, 0, cellSize);
         camera.lookAt(cellSize, 0, 0);
 
@@ -237,6 +397,22 @@ const BackroomsView = ({ onExit }) => {
             lastTime = time;
             frameCount++;
 
+            // Entity Animations
+            entities.forEach(ent => {
+                if (ent.type === 'geometry') {
+                    ent.mesh.rotation.y += 0.5 * delta;
+                    ent.mesh.rotation.z += 0.2 * delta;
+                    ent.particles.children.forEach(p => {
+                        p.position.y -= p.userData.speed;
+                        if (p.position.y < -2) p.position.y = 1.5;
+                    });
+                } else if (ent.type === 'custodian') {
+                    // Gentle swaying
+                    ent.mesh.rotation.z = Math.sin(time / 1000) * 0.05;
+                    ent.head.rotation.y = Math.sin(time / 2000) * 0.3; // Head looking around
+                }
+            });
+
             // Rotation
             if (turnLeft) camera.rotation.y += 2 * delta;
             if (turnRight) camera.rotation.y -= 2 * delta;
@@ -255,6 +431,29 @@ const BackroomsView = ({ onExit }) => {
                 if (mazeGrid[gridZ] && mazeGrid[gridZ][gridX] === 0) {
                     camera.position.x = nextX;
                     camera.position.z = nextZ;
+                }
+            }
+
+            // Raycasting for "Look At" mechanics
+            if (frameCount % 10 === 0) {
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                raycaster.far = 15; // Only detect if close
+
+                const interactables = entities.map(e => e.mesh);
+                const intersects = raycaster.intersectObjects(interactables, true); // Recursive
+
+                if (intersects.length > 0) {
+                    // Find the parent group that has userData
+                    let object = intersects[0].object;
+                    while (object.parent && !object.userData.name) {
+                        object = object.parent;
+                    }
+                    if (object.userData.name) {
+                        setEntityInfo(object.userData);
+                    }
+                } else {
+                    setEntityInfo(null);
                 }
             }
 
@@ -304,6 +503,15 @@ const BackroomsView = ({ onExit }) => {
             // Sync React State (Throttled)
             if (frameCount % 30 === 0) {
                 setSanity(sanityRef.current);
+
+                // Narrative Triggers
+                const elapsedSeconds = (performance.now() - startTimeRef.current) / 1000;
+                const narrative = NARRATIVE_SCRIPT.find(n => Math.abs(n.time - elapsedSeconds) < 1);
+                if (narrative) {
+                    setCurrentThought(narrative.text);
+                    // Clear thought after 5 seconds
+                    setTimeout(() => setCurrentThought(null), 5000);
+                }
             }
 
             renderer.render(scene, camera);
@@ -328,89 +536,242 @@ const BackroomsView = ({ onExit }) => {
         };
     }, []);
 
-    const toggleAudio = () => {
-        if (!audioEnabled) {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const lfo = audioCtx.createOscillator();
-            const lfoGain = audioCtx.createGain();
-            const gainNode = audioCtx.createGain();
-
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(60, audioCtx.currentTime);
-
-            lfo.frequency.setValueAtTime(0.5, audioCtx.currentTime);
-            lfoGain.gain.setValueAtTime(10, audioCtx.currentTime);
-
-            lfo.connect(lfoGain);
-            lfoGain.connect(oscillator.frequency);
-
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            oscillator.start();
-            lfo.start();
-            audioRef.current = { ctx: audioCtx, osc: oscillator, lfo: lfo };
+    const toggleAudio = async () => {
+        if (audioEnabled) {
+            if (audioRef.current) {
+                audioRef.current.ctx.close();
+                clearInterval(audioRef.current.interval);
+                audioRef.current = null;
+            }
+            setAudioEnabled(false);
         } else {
-            audioRef.current?.osc.stop();
-            audioRef.current?.lfo.stop();
-            audioRef.current?.ctx.close();
+            audioRef.current = createAmbiance();
+            setAudioEnabled(true);
+
+            // Resume context if suspended (common browser policy fix)
+            if (audioRef.current.ctx.state === 'suspended') {
+                audioRef.current.ctx.resume();
+            }
         }
-        setAudioEnabled(!audioEnabled);
     };
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.ctx.close();
+                clearInterval(audioRef.current.interval);
+            }
+        }
+    }, []);
 
     return (
         <div className="relative w-full h-screen bg-black overflow-hidden font-mono text-yellow-500">
             <div ref={containerRef} className="w-full h-full" />
 
-            {/* HUD Overlay */}
-            <div className="absolute top-0 left-0 w-full p-6 pointer-events-none flex justify-between items-start">
-                <div className="bg-black/80 p-4 border border-yellow-900/50 backdrop-blur-sm">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Skull className="w-5 h-5 text-red-600" />
-                        <span className="text-sm font-bold uppercase tracking-widest">Sanity Levels</span>
+            {/* HUD Overlay - Premium Redesign */}
+            <div className="absolute top-0 left-0 w-full p-8 pointer-events-none flex justify-between items-start z-40">
+                <div className="bg-black/40 p-6 border-l-2 border-red-800/80 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.5)] max-w-sm">
+                    <div className="flex items-center gap-3 mb-4 border-b border-red-900/30 pb-2">
+                        <Skull className="w-5 h-5 text-red-600 animate-pulse" />
+                        <span className="text-xs font-bold uppercase tracking-[0.2em] text-red-500 font-sans">Vital Systems</span>
                     </div>
-                    <div className="w-48 h-2 bg-yellow-900/30 overflow-hidden border border-yellow-700">
-                        <div
-                            className={`h-full transition-all duration-300 ${sanity < 30 ? 'bg-red-600' : 'bg-yellow-500'}`}
-                            style={{ width: `${sanity}%` }}
-                        />
+
+                    <div className="space-y-4">
+                        <div>
+                            <div className="flex justify-between items-end mb-1">
+                                <span className="text-[10px] uppercase tracking-widest text-gray-400">Psychological Integrity</span>
+                                <span className="text-sm font-mono text-red-500 font-bold">{Math.floor(sanity)}%</span>
+                            </div>
+                            <div className="w-full h-1 bg-gray-900 overflow-hidden">
+                                <div
+                                    className={`h-full transition-all duration-500 ease-out ${sanity < 30 ? 'bg-red-600 animate-pulse' : 'bg-yellow-700'}`}
+                                    style={{ width: `${sanity}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Current Status</p>
+                            <p className="text-xs font-mono text-yellow-600/90 border border-yellow-900/20 bg-yellow-900/10 p-2 uppercase tracking-wide">
+                                {status}
+                            </p>
+                        </div>
                     </div>
-                    <p className="mt-2 text-[10px] text-yellow-700 uppercase">{status}</p>
                 </div>
 
-                <div className="flex flex-col gap-2 pointer-events-auto">
+                <div className="flex flex-col gap-3 pointer-events-auto">
                     <button
                         onClick={onExit}
-                        className="flex items-center gap-2 bg-red-950/80 hover:bg-red-800 p-3 border border-red-500 text-red-200 transition-colors"
+                        className="group flex items-center justify-between w-48 bg-black/60 hover:bg-red-950/80 p-4 border-r-2 border-red-800/50 backdrop-blur-sm transition-all duration-300 hover:w-52"
                     >
-                        <ArrowLeft className="w-4 h-4" /> RECALL TO REALITY
+                        <span className="text-xs font-bold text-red-200 uppercase tracking-widest">Abort Simulation</span>
+                        <ArrowLeft className="w-4 h-4 text-red-500 group-hover:-translate-x-1 transition-transform" />
                     </button>
                     <button
                         onClick={toggleAudio}
-                        className="flex items-center gap-2 bg-black/80 hover:bg-gray-900 p-3 border border-yellow-700 transition-colors"
+                        className="group flex items-center justify-between w-48 bg-black/60 hover:bg-yellow-950/30 p-4 border-r-2 border-yellow-800/50 backdrop-blur-sm transition-all duration-300"
                     >
-                        {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                        {audioEnabled ? "MUTE HUM" : "ENABLE HUM"}
+                        <span className="text-xs font-bold text-yellow-200 uppercase tracking-widest">{audioEnabled ? "Silence" : "Enable Audio"}</span>
+                        {audioEnabled ? <Volume2 className="w-4 h-4 text-yellow-500" /> : <VolumeX className="w-4 h-4 text-gray-600" />}
                     </button>
                 </div>
             </div>
 
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/60 p-4 border border-yellow-700 animate-pulse text-center">
-                <div className="flex items-center gap-4 mb-1 justify-center">
-                    <div className="flex items-center gap-1"><Move className="w-3 h-3" /> W/S: MOVE</div>
-                    <div className="flex items-center gap-1"><Move className="w-3 h-3 rotate-90" /> A/D: TURN</div>
+            {/* Bottom Controls Hint */}
+            <div className="absolute bottom-12 left-12 pointer-events-none opacity-50">
+                <div className="flex items-center gap-6 text-[10px] font-mono text-gray-500 uppercase tracking-[0.2em]">
+                    <span className="flex items-center gap-2"><div className="w-4 h-4 border border-gray-700 flex items-center justify-center">W</div> Move</span>
+                    <span className="flex items-center gap-2"><div className="w-4 h-4 border border-gray-700 flex items-center justify-center">A</div> View</span>
                 </div>
-                <p className="text-[10px] text-yellow-800 uppercase">Warning: Spatial consistency is failing. Do not stop.</p>
+            </div>
+
+            {/* Entity Metadata Popup */}
+            {entityInfo && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50 animate-scale-in">
+                    <div className="flex flex-col items-center">
+                        <div className="border border-white/20 bg-black/60 backdrop-blur-md p-1 rotate-45 mb-4">
+                            <div className="w-2 h-2 bg-red-500 animate-ping" />
+                        </div>
+                        <h2 className="text-3xl font-header font-black text-red-500 uppercase tracking-widest drop-shadow-lg bg-black/80 px-4 py-1">
+                            {entityInfo.name}
+                        </h2>
+                        <p className="text-sm font-mono text-gray-300 bg-black/80 px-3 py-1 mt-1 max-w-xs text-center border-l-2 border-red-500">
+                            {entityInfo.desc}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Manifest Reality (AI Texture Gen) Button */}
+            <div className="absolute top-24 right-8 pointer-events-auto z-50">
+                <button
+                    onClick={() => {
+                        if (isManifesting) return;
+                        setIsManifesting(true);
+                        // Simulate interaction with "Google Imagen 3" API
+                        setTimeout(() => {
+                            if (containerRef.current && containerRef.current.userData) {
+                                const { wallMaterial, floorMaterial, textureLoader } = containerRef.current.userData;
+
+                                // Load "AI Generated" textures
+                                const newWall = textureLoader.load('/Creepy_Horror_Stories/images/manifest_wall.png');
+                                const newFloor = textureLoader.load('/Creepy_Horror_Stories/images/manifest_floor.png');
+
+                                newWall.wrapS = THREE.RepeatWrapping; newWall.wrapT = THREE.RepeatWrapping;
+                                newFloor.wrapS = THREE.RepeatWrapping; newFloor.wrapT = THREE.RepeatWrapping;
+
+                                wallMaterial.map = newWall;
+                                floorMaterial.map = newFloor;
+                                wallMaterial.color.setHex(0xffffff); // Reset tint for full texture
+                                floorMaterial.color.setHex(0xffffff);
+
+                                wallMaterial.needsUpdate = true;
+                                floorMaterial.needsUpdate = true;
+                            }
+                            setIsManifesting(false);
+                            setCurrentThought("The reality shift is complete... nature is rotting.");
+                        }, 3000); // 3s generation delay
+                    }}
+                    className={`flex items-center gap-3 bg-black/80 border ${isManifesting ? 'border-red-500 animate-pulse' : 'border-purple-600'} p-3 backdrop-blur-md hover:bg-purple-900/20 transition-all group`}
+                >
+                    {isManifesting ? (
+                        <>
+                            <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs font-bold text-red-400 uppercase tracking-widest">Manifesting...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Eye className="w-4 h-4 text-purple-500 group-hover:text-purple-300" />
+                            <span className="text-xs font-bold text-purple-400 group-hover:text-white uppercase tracking-widest">Manifest Reality</span>
+                        </>
+                    )}
+                </button>
             </div>
 
             {sanity < 25 && (
                 <div className="absolute inset-0 bg-red-900/20 pointer-events-none animate-flicker mix-blend-overlay" />
             )}
+
+            {/* Narrative Thought Overlay */}
+            {currentThought && (
+                <div className="absolute top-1/3 left-0 w-full flex justify-center pointer-events-none z-50 animate-fade-in-slow">
+                    <div className="bg-black/40 backdrop-blur-sm px-12 py-6 border-y border-red-500/10">
+                        <p className="text-xl md:text-2xl font-serif text-gray-200 italic tracking-widest drop-shadow-lg max-w-3xl leading-relaxed">
+                            "{currentThought}"
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
+};
+
+// --- Audio Synthesis (Dark Ambience) ---
+const createAmbiance = () => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = 0.3;
+    masterGain.connect(ctx.destination);
+
+    // 1. Low Drone (Sine Wave)
+    const drone = ctx.createOscillator();
+    drone.type = 'sine';
+    drone.frequency.value = 50; // Deep sub-bass
+    const droneGain = ctx.createGain();
+    droneGain.gain.value = 0.5;
+    drone.connect(droneGain);
+    droneGain.connect(masterGain);
+    drone.start();
+
+    // 2. Industrial Rumble (Brown Noise)
+    const bufferSize = 2 * ctx.sampleRate;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 3; // Brownian-ish
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 120; // Muffeled rumble
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0.2;
+
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(masterGain);
+    noise.start();
+
+    // 3. Random Metallic Clanks
+    const interval = setInterval(() => {
+        if (Math.random() > 0.7) {
+            const clank = ctx.createOscillator();
+            clank.type = 'sawtooth';
+            clank.frequency.setValueAtTime(100 + Math.random() * 200, ctx.currentTime);
+            clank.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+
+            const clankGain = ctx.createGain();
+            clankGain.gain.setValueAtTime(0.1, ctx.currentTime);
+            clankGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
+
+            const clankFilter = ctx.createBiquadFilter();
+            clankFilter.type = 'bandpass';
+            clankFilter.frequency.value = 500 + Math.random() * 500;
+
+            clank.connect(clankFilter);
+            clankFilter.connect(clankGain);
+            clankGain.connect(masterGain);
+
+            clank.start();
+            clank.stop(ctx.currentTime + 2);
+        }
+    }, 4000);
+
+    return { ctx, interval };
 };
 
 // --- Main App Component ---
@@ -434,7 +795,7 @@ export default function App() {
     return (
         <div className={`min-h-screen bg-[#050505] text-gray-300 font-serif selection:bg-red-900 selection:text-white transition-all duration-1000 ${sanityState < 90 ? 'animate-vibrate' : ''}`}>
 
-            <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden opacity-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] pointer-events-none" />
+            {/* CRT Overlay Removed by User Request */}
 
             <nav className="fixed top-0 left-0 w-full bg-black/90 border-b border-red-900/30 backdrop-blur-md z-40 p-4 flex justify-between items-center px-8">
                 <div className="flex items-center gap-3">
@@ -495,48 +856,59 @@ export default function App() {
                             <div
                                 key={story.id}
                                 onClick={() => setActiveId(story.id)}
-                                className="group relative bg-[#0a0a0a] border border-gray-800 p-0 cursor-pointer overflow-hidden transition-all hover:border-red-600/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] rounded-lg"
+                                className="group relative bg-[#080808] border border-gray-800/60 p-0 cursor-pointer overflow-hidden transition-all duration-500 hover:border-red-900/60 hover:shadow-[0_0_40px_rgba(220,38,38,0.05)] rounded-sm"
                             >
+                                {/* Top Tab for "File" Look */}
+                                <div className="absolute top-0 right-0 bg-gray-900/50 px-3 py-1 border-b border-l border-gray-800 text-[9px] font-mono text-gray-500 uppercase tracking-widest group-hover:bg-red-950/30 group-hover:text-red-400 transition-colors">
+                                    Case File #{story.id.toUpperCase().substring(0, 4)}
+                                </div>
+
                                 {/* Story Image */}
                                 {story.imageUrl && (
-                                    <div className="w-full h-48 overflow-hidden relative border-b border-gray-800 group-hover:border-red-900/30 transition-colors">
+                                    <div className="w-full h-56 overflow-hidden relative border-b border-gray-800/50">
+                                        <div className="absolute inset-0 bg-red-900/10 mix-blend-overlay z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                                         <img
                                             src={story.imageUrl}
                                             alt={story.title}
-                                            className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 filter grayscale group-hover:grayscale-0"
+                                            className="w-full h-full object-cover opacity-50 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 filter grayscale contrast-125 group-hover:grayscale-0"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent" />
+
+                                        {/* Status Indicator */}
+                                        <div className="absolute bottom-3 left-3 flex items-center gap-2 z-20">
+                                            <div className={`w-2 h-2 rounded-full ${story.is3D ? 'bg-red-500 animate-pulse shadow-[0_0_10px_#ef4444]' : 'bg-gray-600'}`} />
+                                            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 group-hover:text-gray-200">
+                                                {story.is3D ? 'Live Feed' : 'Archived'}
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
 
-                                <div className="p-8 relative">
-                                    <div className="absolute top-4 right-4 opacity-20 group-hover:opacity-100 transition-opacity z-10">
-                                        {story.is3D ? <Eye className="w-6 h-6 text-red-600" /> : <Skull className="w-6 h-6 text-gray-700" />}
-                                    </div>
+                                <div className="p-8 pt-6 relative">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-red-900/0 group-hover:bg-red-900/50 transition-all duration-500" />
 
-                                    <h3 className="text-2xl font-bold mb-3 text-gray-200 group-hover:text-red-500 transition-colors uppercase tracking-tight font-header">
+                                    <h3 className="text-3xl font-bold mb-3 text-gray-300 group-hover:text-red-500 transition-colors uppercase tracking-tighter font-header leading-none">
                                         {story.title}
                                     </h3>
-                                    <p className="text-gray-500 text-sm mb-6 leading-relaxed line-clamp-2 font-serif">
+
+                                    <div className="flex items-center gap-4 mb-4 text-[10px] font-mono text-gray-600 uppercase tracking-widest border-b border-gray-900 pb-4 group-hover:border-red-900/20 transition-colors">
+                                        <span className="text-red-900 group-hover:text-red-700">Auth: {story.author}</span>
+                                        <span>//</span>
+                                        <span>{story.date}</span>
+                                    </div>
+
+                                    <p className="text-gray-500 text-sm mb-6 leading-relaxed line-clamp-2 font-serif group-hover:text-gray-400 transition-colors">
                                         {story.summary}
                                     </p>
 
                                     <div className="flex flex-wrap gap-2">
                                         {story.tags.map(tag => (
-                                            <span key={tag} className="text-[10px] uppercase tracking-widest bg-gray-900 px-2 py-1 text-gray-500 border border-gray-800">
-                                                #{tag}
+                                            <span key={tag} className="text-[9px] uppercase tracking-widest bg-black px-2 py-1 text-gray-600 border border-gray-800 group-hover:border-red-900/30 group-hover:text-red-900/70 transition-colors">
+                                                {tag}
                                             </span>
                                         ))}
                                     </div>
-
-                                    {story.is3D && (
-                                        <div className="mt-4 flex items-center gap-2 text-[10px] text-red-600 font-bold uppercase animate-pulse">
-                                            <Info className="w-3 h-3" /> Interactive simulation available
-                                        </div>
-                                    )}
                                 </div>
-
-                                <div className="absolute bottom-0 left-0 w-full h-1 bg-red-900 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                             </div>
                         ))}
                     </div>
