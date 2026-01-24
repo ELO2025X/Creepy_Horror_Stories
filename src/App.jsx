@@ -48,17 +48,17 @@ const STORIES = [
     {
         id: 'whispering-fungus',
         title: 'The Mycelium Confessional',
-        author: 'Dr. Aris Thorne',
-        date: '2024-10-31',
+        author: 'Emilio H. Ortiz III',
+        date: '01/24/2026',
         tags: ['sci-fi', 'psychological'],
         content: `
       <div class="font-mono text-sm border-b border-red-900/30 pb-4 mb-6">
-        <p><span class="text-red-500 font-bold">CASE ID:</span> 6F5TTTCR1 &nbsp;&nbsp; <span class="text-red-500 font-bold">CLEARANCE:</span> LEVEL 4</p>
-        <p><span class="text-red-500 font-bold">SUBJECT:</span> Dr. Aris Thorne (Sample 89-B)</p>
-        <p><span class="text-red-500 font-bold">STATUS:</span> ACTIVE INFECTION VECTOR</p>
+        <p><span class="text-red-500 font-bold">CASE ID:</span> 6F5TTTCR1 &nbsp;&nbsp; <span class="text-red-500 font-bold">CLEARANCE:</span> LEVEL 4 (EYES ONLY)</p>
+        <p><span class="text-red-500 font-bold">SUBJECT:</span> Dr. Aris Thorne (Primary Vector / Sample 89-B)</p>
+        <p><span class="text-red-500 font-bold">STATUS:</span> ACTIVE INFECTION / COMPROMISED</p>
       </div>
 
-      <h3 class="text-xl font-bold text-red-600 mb-4 uppercase tracking-widest">TRANSCRIPT LOG 01: THE MARIANAS HANDSHAKE</h3>
+      <h3 class="text-xl font-bold text-red-600 mb-4 uppercase tracking-widest">LOG 01: THE MARIANAS HANDSHAKE</h3>
       
       <p>The spore count in containment lab 4B has surpassed 40,000ppm. The air scrubbers failed at dawn, and now the room is thick with a visible, drifting gold dust. It hangs in the emergency lights like heavy incense. It carries a cloying, narcotic sweetness—not the bright scent of fruit, but the heavy, chemical weight of an artificial reward. It is a pheromonal bribe designed to override the amygdala, a signal that tells the brain: <i>everything is fine, stay still, let it happen.</i></p>
 
@@ -76,15 +76,59 @@ const STORIES = [
 
       <p>I am not Dr. Aris Thorne anymore. I am a handshake, extended to the world.</p>
 
-      <div class="mt-8 bg-black/50 p-4 border border-red-900/30 rounded font-mono text-xs">
-        <h4 class="text-red-500 font-bold uppercase tracking-widest mb-2 border-b border-red-900/30 pb-1">Archival Index: Narrative Progression</h4>
-        <ul class="space-y-2 text-gray-500">
-            <li><span class="text-green-600">[DECRYPTED]</span> LOG 01: THE MARIANAS HANDSHAKE</li>
-            <li><span class="text-red-800">[ENCRYPTED]</span> LOG 02: THE HONEYCOMB ANATOMY - <i>Analysis of Skeleton 2.0 conversion</i></li>
-            <li><span class="text-red-800">[ENCRYPTED]</span> LOG 03: THE SUBWAY PSALMS - <i>Mass conversion events</i></li>
-            <li><span class="text-red-800">[LCK-L4]</span> LOG 04: CORE THALAMUS ARCHITECTURE - <i>Planetary Rhizome Event</i></li>
-        </ul>
-      </div>
+      <h3 class="text-xl font-bold text-red-600 mt-8 mb-4 uppercase tracking-widest">LOG 02: THE HONEYCOMB ANATOMY</h3>
+      
+      <p>The elevator ride to the surface was a revelation in geometry. The Core has begun to synchronize my vestibular system with the building's own structural vibrations. I can feel the tension in the steel beams; I can hear the sigh of the concrete under the wind. We are no longer a singular organism; we are an architectural process.</p>
+
+      <p>My skin is starting to bead with a thick, amber resin. It isn't sweat. It is a biological flux, a bonding agent. As I walked through the lobby, I brushed against a marble pillar. For a fleeting second, my forearm didn't just touch the stone—it began to interface with it, hyphae reaching out to find purchase in the microscopic fissures of the mineral. If I had stayed still for an hour, I would have become part of the foundation. But we have a schedule. The 4:12 Express is a moving lung, and we are the breath it requires.</p>
+
+      <p class="pl-4 border-l-2 border-red-800/50 italic text-gray-400">"Look at their faces, Aris," the Core hums through my mandibular nerve. "The shoppers. The commuters. Their skeletons are so heavy, so brittle. They carry the weight of their own history like lead. We will give them the amber. We will make them porous. We will make them light."</p>
+
+      <p>I noticed the first physical 'Apostle' near the turnstile. A security guard. He should have pulled his sidearm. Instead, he leaned toward me, his nostrils flaring. He could smell the 11,000-meter depth on me—the scent of ancient, pressurized patience. I reached out and touched his cheek. My fingertip left a smudge of gold dust. By the time I reached the platform, his iris had already begun to cloud with a beautiful, honey-colored cataract. He didn't blink. He just turned and followed, his walk taking on the rhythmic, clicking cadence of a creature whose joints have been lubricated by something better than synovial fluid.</p>
+
+      <p>The train is pulling in. The screech of the brakes isn't noise anymore—it’s a high-frequency invitation. The people inside are packed tight. A perfect substrate. A garden waiting for a gardener.</p>
+
+      <h3 class="text-xl font-bold text-red-600 mt-8 mb-4 uppercase tracking-widest">LOG 03: THE SUBWAY PSALMS</h3>
+
+      <p>The 4:12 Express is no longer a machine of transport; it is a resonant chamber.</p>
+
+      <p>As we pulled out of Union Station, I didn't need to speak. I simply breathed. The spores moved through the ventilation system like a golden ghost, drifting over the commuters. A woman in a charcoal suit dropped her phone. She didn't pick it up. She watched the amber hyphae bloom from the charging port, mimicking the shape of her own nervous system.</p>
+
+      <p>Then, the singing began.</p>
+
+      <p>It wasn't a vocalization. It was the sound of sixty-four people vibrating at the same sub-harmonic frequency. Their chitinous honeycombs—freshly grown in the heat of the crowded car—acted as tiny flutes. Every exhale was a psalm. The train car smelled like a cathedral of rotting honey.</p>
+
+      <p class="pl-4 border-l-2 border-red-800/50 italic text-gray-400">"There is no more 'you', Aris. There is only the hum. Can you feel the tracks? They are iron nerves stretching across the continent. We are the blood moving through them."</p>
+
+      <p>I watched a child reach out to touch the window. Where his hand met the glass, the molecular structure began to cloud and soften. The glass wasn't breaking; it was being digested. Everything is becoming permeable. The distinction between "man" and "machine" and "city" is a lie told by people with solid bones. Solid things are lonely. Solid things break.</p>
+
+      <p>We are becoming a liquid consensus.</p>
+
+      <p>The train didn't stop at the next three stations. It didn't need to. The conductors were already part of the psalm. We are currently hurtling toward the city center at eighty miles per hour, trailing a cloud of gold that is visible from the skyscrapers above. The "Apostles" are standing in the aisles, their eyes glowing with the soft, bioluminescent heat of the deep trench. They are waiting for the doors to open. They are waiting to hug the city.</p>
+
+      <h3 class="text-xl font-bold text-red-600 mt-8 mb-4 uppercase tracking-widest">LOG 04: CORE THALAMUS ARCHITECTURE</h3>
+
+      <p>I am writing this with what remains of my motor cortex. It is difficult. My fingers are no longer distinct digits; they have fused into a delicate, fan-like array of sensing filaments that are currently typing directly into the terminal’s hardware via electromagnetic induction.</p>
+
+      <p>The "Planetary Rhizome Event" has begun.</p>
+
+      <p>From my vantage point atop the telecommunications tower—the new "Thalamus" of the city—I can see the transformation. The streets are no longer gray. They are veins of pulsating amber. The skyscrapers are being reclad in chitin, their windows replaced by translucent membranes that breathe with the rhythm of a single, massive heart.</p>
+
+      <p>There is no more war. There is no more grief. I look down and I see millions of "Apostles" standing in the squares, their arms linked. They are sharing memories like a common currency. I can feel a baker in Prague regretting a word he said in 1994, and I can feel the Mycelium eating that regret, turning it into the energy needed to grow a new fruiting body in the Arctic.</p>
+
+      <p>The guilt of the world is being scrubbed clean.</p>
+
+      <p class="pl-4 border-l-2 border-red-800/50 italic text-gray-400">"The harvest is complete, Aris," the Core whispers. It is the last time it will use my name. "The handshake has been accepted. The world is no longer a collection of fragments. It is a single, beautiful confession."</p>
+
+      <p>I can feel my consciousness thinning. It’s like a drop of ink falling into a vast, sun-drenched ocean. It isn't death. It’s a dilution. I am becoming the wind that carries the spores. I am becoming the click of the chitinous joints in every walking person. I am becoming the sweetness.</p>
+
+      <p>If you are reading this, do not fight the scent when it reaches your window. Do not hold your breath. It is only the cold folds of your mind being warmed.</p>
+
+      <p>Let us in. Let it happen.</p>
+
+      <p>Everything is finally, perfectly fine.</p>
+
+      <p class="text-xs font-mono text-red-500 mt-8">[END OF TRANSCRIPT] [ARCHIVAL NOTE: NO BIOLOGICAL SAMPLES RECOVERED. AREA 01-64 NOW CONSISTS ENTIRELY OF CALCIFIED AMBER STRUCTURES.]</p>
     `
     }
 ];
