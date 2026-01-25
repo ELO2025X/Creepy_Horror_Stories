@@ -23,8 +23,8 @@ const BackroomsView = ({ onExit }) => {
     const sanityRef = useRef(100);
     const startTimeRef = useRef(performance.now());
 
-    // Maze Configuration (1 = Wall, 0 = Path)
-    const mazeGrid = [
+    // Mutable Maze Grid
+    const mazeGridRef = useRef([
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
@@ -35,8 +35,9 @@ const BackroomsView = ({ onExit }) => {
         [1, 0, 0, 1, 0, 0, 0, 1, 0, 1],
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ];
+    ]);
     const cellSize = 10;
+    const wallMeshesRef = useRef([]); // To track wall objects for animation
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -86,7 +87,7 @@ const BackroomsView = ({ onExit }) => {
             map: carpetTexture,
             color: 0x999999
         });
-        containerRef.current.userData = { wallMaterial, floorMaterial, textureLoader }; // Store for access
+        containerRef.current.userData = { wallMaterial, floorMaterial }; // Store for access
         const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
 
         // Build Maze
@@ -94,47 +95,60 @@ const BackroomsView = ({ onExit }) => {
         const wallGeometry = new THREE.BoxGeometry(cellSize, 6, cellSize);
         const floorGeometry = new THREE.PlaneGeometry(cellSize, cellSize);
 
-        let objectCount = 0;
-        mazeGrid.forEach((row, r) => {
+        // Grid Initialization
+        wallMeshesRef.current = [];
+        const grid = mazeGridRef.current;
+
+        grid.forEach((row, r) => {
+            const rowMeshes = [];
             row.forEach((cell, c) => {
                 const x = c * cellSize;
                 const z = r * cellSize;
 
-                // Floor and Ceiling
+                // Floor and Ceiling (Always exist)
                 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
                 floor.rotation.x = -Math.PI / 2;
                 floor.position.set(x, -3, z);
                 mazeGroup.add(floor);
-                objectCount++;
 
                 const ceiling = new THREE.Mesh(floorGeometry, ceilingMaterial);
                 ceiling.rotation.x = Math.PI / 2;
                 ceiling.position.set(x, 3, z);
                 mazeGroup.add(ceiling);
-                objectCount++;
 
-                // Walls
-                if (cell === 1) {
-                    const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-                    wall.position.set(x, 0, z);
-                    mazeGroup.add(wall);
-                    objectCount++;
-                }
+                // Walls (Dynamic)
+                // We create a wall mesh for EVERY cell, but position path-walls underground
+                const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+                const isBorder = r === 0 || r === grid.length - 1 || c === 0 || c === row.length - 1;
+
+                // Initial placement: 0 for wall, -6 for path (underground)
+                const targetY = cell === 1 ? 0 : -6;
+                wall.position.set(x, targetY, z);
+
+                // Store metadata for animation
+                wall.userData = {
+                    gridX: c,
+                    gridZ: r,
+                    isBorder: isBorder,
+                    targetY: targetY,
+                    currentY: targetY // Current Y position for animation
+                };
+
+                mazeGroup.add(wall);
+                rowMeshes.push(wall);
             });
+            wallMeshesRef.current.push(rowMeshes);
         });
         scene.add(mazeGroup);
-        console.log(`Maze built with ${objectCount} objects`);
-        console.log("Total objects in scene:", scene.children.length);
+        console.log(`Maze built with dynamic walls`);
 
         // Lights
-        const lights = [];
-        mazeGrid.forEach((row, r) => {
+        grid.forEach((row, r) => {
             row.forEach((cell, c) => {
-                if (cell === 0 && Math.random() > 0.7) {
+                if (Math.random() > 0.7) { // Slightly higher chance for lights
                     const pLight = new THREE.PointLight(0xffffcc, 1.5, 25);
                     pLight.position.set(c * cellSize, 1.5, r * cellSize);
                     scene.add(pLight);
-                    lights.push(pLight);
                 }
             });
         });
@@ -151,7 +165,7 @@ const BackroomsView = ({ onExit }) => {
         camera.add(flashlight.target);
         scene.add(camera);
 
-        // Entity (The Watcher)
+        // Entity (The Watcher) - This is a placeholder, not an actual entity
         const entityGeo = new THREE.BoxGeometry(1, 4, 1);
         const entityMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0 });
         const entity = new THREE.Mesh(entityGeo, entityMat);
@@ -222,35 +236,35 @@ const BackroomsView = ({ onExit }) => {
             const dirtyClothMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.9 });
             const rustMat = new THREE.MeshStandardMaterial({ color: 0x5a3a2a, metalness: 0.6, roughness: 0.8 });
 
-            // Legs
-            const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 3), dirtyClothMat);
-            leftLeg.position.set(-0.5, 1.5, 0);
+            // Legs (Shorter)
+            const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 2.2), dirtyClothMat);
+            leftLeg.position.set(-0.5, 1.1, 0);
             group.add(leftLeg);
-            const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 3), dirtyClothMat);
-            rightLeg.position.set(0.5, 1.5, 0);
+            const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 2.2), dirtyClothMat);
+            rightLeg.position.set(0.5, 1.1, 0);
             group.add(rightLeg);
 
-            // Torso
-            const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.4, 2.5), dirtyClothMat);
-            torso.position.set(0, 4, 0);
+            // Torso (Lowered)
+            const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.4, 2.2), dirtyClothMat);
+            torso.position.set(0, 3.2, 0);
             group.add(torso);
 
-            // Arms (Holding Mop)
-            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 2.5), dirtyClothMat);
-            leftArm.position.set(-0.8, 4.5, 0.5);
+            // Arms (Lowered)
+            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 2.2), dirtyClothMat);
+            leftArm.position.set(-0.8, 3.6, 0.5);
             leftArm.rotation.z = 0.5;
             leftArm.rotation.x = -0.5;
             group.add(leftArm);
 
-            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 2.5), dirtyClothMat);
-            rightArm.position.set(0.8, 4.5, -0.5);
+            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 2.2), dirtyClothMat);
+            rightArm.position.set(0.8, 3.6, -0.5);
             rightArm.rotation.z = -0.5;
             rightArm.rotation.x = 0.5;
             group.add(rightArm);
 
-            // Head (Birdcage)
+            // Head (Birdcage - Lowered significanty)
             const cageGroup = new THREE.Group();
-            cageGroup.position.set(0, 5.8, 0);
+            cageGroup.position.set(0, 4.8, 0); // Lowered from 5.8
 
             // Cage Base & Top
             const cageBase = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.05, 8, 16), rustMat);
@@ -280,11 +294,11 @@ const BackroomsView = ({ onExit }) => {
 
             group.add(cageGroup);
 
-            // Mop
-            const mopHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 6), new THREE.MeshStandardMaterial({ color: 0x3d2817 }));
+            // Mop (Lowered)
+            const mopHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 5), new THREE.MeshStandardMaterial({ color: 0x3d2817 }));
             mopHandle.rotation.z = 0.2;
             mopHandle.rotation.y = 0.2;
-            mopHandle.position.set(0.5, 3, 1);
+            mopHandle.position.set(0.5, 2.5, 1);
             group.add(mopHandle);
 
             group.userData = {
@@ -306,18 +320,20 @@ const BackroomsView = ({ onExit }) => {
         camera.lookAt(cellSize, 0, 0);
 
         // Controls
-        let moveForward = false, moveBackward = false, turnLeft = false, turnRight = false;
+        let moveForward = false, moveBackward = false, turnLeft = false, turnRight = false, isRunning = false;
         const onKeyDown = (e) => {
             if (e.key === 'w' || e.key === 'ArrowUp') moveForward = true;
             if (e.key === 's' || e.key === 'ArrowDown') moveBackward = true;
             if (e.key === 'a' || e.key === 'ArrowLeft') turnLeft = true;
             if (e.key === 'd' || e.key === 'ArrowRight') turnRight = true;
+            if (e.code === 'Space') isRunning = true;
         };
         const onKeyUp = (e) => {
             if (e.key === 'w' || e.key === 'ArrowUp') moveForward = false;
             if (e.key === 's' || e.key === 'ArrowDown') moveBackward = false;
             if (e.key === 'a' || e.key === 'ArrowLeft') turnLeft = false;
             if (e.key === 'd' || e.key === 'ArrowRight') turnRight = false;
+            if (e.code === 'Space') isRunning = false;
         };
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
@@ -327,6 +343,7 @@ const BackroomsView = ({ onExit }) => {
         let blackoutTimer = 0;
         let entityTimer = 0;
         let frameCount = 0;
+        let shiftTimer = 0;
 
         const animate = () => {
             const frameId = requestAnimationFrame(animate);
@@ -335,19 +352,153 @@ const BackroomsView = ({ onExit }) => {
             lastTime = time;
             frameCount++;
 
-            // Entity Animations
+            // --- Maze Shifting Logic ---
+            shiftTimer += delta;
+            if (shiftTimer > 2.0) { // Try to shift every 2 seconds
+                shiftTimer = 0;
+                if (Math.random() > 0.3) { // 70% chance to shift
+                    const grid = mazeGridRef.current;
+                    const h = grid.length;
+                    const w = grid[0].length;
+
+                    // Pick random interior cell (avoiding borders)
+                    const r = Math.floor(Math.random() * (h - 2)) + 1;
+                    const c = Math.floor(Math.random() * (w - 2)) + 1;
+
+                    // Toggle state in the mutable grid
+                    const currentState = grid[r][c];
+                    const newState = currentState === 1 ? 0 : 1;
+                    grid[r][c] = newState;
+
+                    // Trigger Mesh Animation
+                    const wallMesh = wallMeshesRef.current[r][c];
+                    wallMesh.userData.targetY = newState === 1 ? 0 : -6; // 0 for wall, -6 for path
+                }
+            }
+
+            // Animate Walls
+            wallMeshesRef.current.forEach(row => {
+                row.forEach(wall => {
+                    // Only animate non-border walls
+                    if (!wall.userData.isBorder && Math.abs(wall.position.y - wall.userData.targetY) > 0.01) {
+                        // Lerp towards target Y position
+                        wall.position.y += (wall.userData.targetY - wall.position.y) * 2.0 * delta;
+                    }
+                });
+            });
+
+            // --- Janitor AI & Roaming Logic ---
             entities.forEach(ent => {
-                if (ent.type === 'geometry') {
+                if (ent.type === 'custodian') {
+                    const userData = ent.mesh.userData; // Shortcut accessor
+
+                    // Initialize State
+                    if (!userData.aiState) userData.aiState = 'PATROL';
+                    if (!userData.lastSawPlayer) userData.lastSawPlayer = 0;
+
+                    const moveSpeed = userData.aiState === 'CHASE' ? 4.5 * delta : 1.5 * delta; // FAST chase
+
+                    // Gentle swaying (faster if chasing)
+                    const swaySpeed = userData.aiState === 'CHASE' ? 10 : 1;
+                    ent.mesh.rotation.z = Math.sin(time / (1000 / swaySpeed)) * 0.05;
+                    ent.head.rotation.y = Math.sin(time / (2000 / swaySpeed)) * 0.3;
+
+                    // 1. Line of Sight Check
+                    if (frameCount % 10 === 0) {
+                        const dirToPlayer = new THREE.Vector3().subVectors(camera.position, ent.mesh.position);
+                        const dist = dirToPlayer.length();
+                        dirToPlayer.normalize();
+
+                        const raycaster = new THREE.Raycaster(ent.mesh.position, dirToPlayer, 0, 25);
+                        const intercepts = raycaster.intersectObjects(mazeGroup.children);
+
+                        let canSee = false;
+                        if (dist < 25) {
+                            if (intercepts.length === 0 || intercepts[0].distance > dist) {
+                                canSee = true;
+                            }
+                        }
+
+                        if (canSee) {
+                            userData.aiState = 'CHASE';
+                            userData.lastSawPlayer = time;
+                        } else {
+                            if (time - userData.lastSawPlayer > 5000) {
+                                userData.aiState = 'PATROL';
+                            }
+                        }
+                    }
+
+                    // 2. Movement Logic
+                    if (!userData.targetPos) {
+                        const currentGridX = Math.round(ent.mesh.position.x / cellSize);
+                        const currentGridZ = Math.round(ent.mesh.position.z / cellSize);
+
+                        // Valid Neighbors (Check mutable grid)
+                        const neighbors = [];
+                        const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+                        dirs.forEach(([dx, dz]) => {
+                            const nx = currentGridX + dx;
+                            const nz = currentGridZ + dz;
+                            if (mazeGridRef.current[nz] && mazeGridRef.current[nz][nx] === 0) {
+                                neighbors.push({ x: nx * cellSize, z: nz * cellSize });
+                            }
+                        });
+
+                        if (neighbors.length > 0) {
+                            if (userData.aiState === 'CHASE') {
+                                // Greedy Best-First Search
+                                let bestParams = { node: null, dist: Infinity };
+                                neighbors.forEach(n => {
+                                    const d = Math.sqrt(Math.pow(n.x - camera.position.x, 2) + Math.pow(n.z - camera.position.z, 2));
+                                    if (d < bestParams.dist) {
+                                        bestParams = { node: n, dist: d };
+                                    }
+                                });
+                                userData.targetPos = bestParams.node || neighbors[0];
+                            } else {
+                                // Random Patrol
+                                userData.targetPos = neighbors[Math.floor(Math.random() * neighbors.length)];
+                            }
+                        } else {
+                            userData.targetPos = { x: ent.mesh.position.x, z: ent.mesh.position.z };
+                        }
+                    } else {
+                        // Move to Target
+                        const target = userData.targetPos;
+                        const dx = target.x - ent.mesh.position.x;
+                        const dz = target.z - ent.mesh.position.z;
+                        const distToTarget = Math.sqrt(dx * dx + dz * dz);
+
+                        if (distToTarget < 0.2) {
+                            ent.mesh.position.x = target.x;
+                            ent.mesh.position.z = target.z;
+                            userData.targetPos = null;
+                        } else {
+                            ent.mesh.position.x += (dx / distToTarget) * moveSpeed;
+                            ent.mesh.position.z += (dz / distToTarget) * moveSpeed;
+                            ent.mesh.lookAt(target.x, ent.mesh.position.y, target.z);
+                        }
+                    }
+
+                    // 3. Proximity Effects
+                    const distToPlayer = ent.mesh.position.distanceTo(camera.position);
+                    if (distToPlayer < 8) {
+                        const intensity = (8 - distToPlayer) / 8;
+                        sanityRef.current -= intensity * 2.0 * delta;
+                        camera.position.y += (Math.random() - 0.5) * intensity * 0.2;
+
+                        if (userData.aiState === 'CHASE') {
+                            setEntityInfo({ name: "THE CUSTODIAN", desc: "IT SEES YOU.", type: 'enemy' });
+                        }
+                    }
+                } else if (ent.type === 'geometry') {
                     ent.mesh.rotation.y += 0.5 * delta;
                     ent.mesh.rotation.z += 0.2 * delta;
                     ent.particles.children.forEach(p => {
                         p.position.y -= p.userData.speed;
                         if (p.position.y < -2) p.position.y = 1.5;
                     });
-                } else if (ent.type === 'custodian') {
-                    // Gentle swaying
-                    ent.mesh.rotation.z = Math.sin(time / 1000) * 0.05;
-                    ent.head.rotation.y = Math.sin(time / 2000) * 0.3; // Head looking around
                 }
             });
 
@@ -361,14 +512,32 @@ const BackroomsView = ({ onExit }) => {
                 camera.getWorldDirection(direction);
                 if (moveBackward) direction.negate();
 
-                const nextX = camera.position.x + direction.x * 5 * delta;
-                const nextZ = camera.position.z + direction.z * 5 * delta;
+                const speed = isRunning ? 8.0 : 3.0; // Run vs Walk
+                const nextX = camera.position.x + direction.x * speed * delta;
+                const nextZ = camera.position.z + direction.z * speed * delta;
+
+                // Collision with Dynamic Grid
                 const gridX = Math.round(nextX / cellSize);
                 const gridZ = Math.round(nextZ / cellSize);
 
-                if (mazeGrid[gridZ] && mazeGrid[gridZ][gridX] === 0) {
+                // Check boundary and wall state (0 = path)
+                // Use mazeGridRef.current for collision detection
+                if (mazeGridRef.current[gridZ] && mazeGridRef.current[gridZ][gridX] === 0) {
                     camera.position.x = nextX;
                     camera.position.z = nextZ;
+                } else {
+                    // Collision: Implement basic sliding
+                    const currGridX = Math.round(camera.position.x / cellSize);
+                    const currGridZ = Math.round(camera.position.z / cellSize);
+
+                    // Try moving only in X direction
+                    if (mazeGridRef.current[currGridZ] && mazeGridRef.current[currGridZ][gridX] === 0) {
+                        camera.position.x = nextX;
+                    }
+                    // Try moving only in Z direction
+                    if (mazeGridRef.current[gridZ] && mazeGridRef.current[gridZ][currGridX] === 0) {
+                        camera.position.z = nextZ;
+                    }
                 }
             }
 
@@ -467,24 +636,29 @@ const BackroomsView = ({ onExit }) => {
     }, [audioEnabled]);
 
 
-    // AI Manifest Reality Handler
+    // AI Manifest Reality Handler (Updated for "Damp/Mold" look)
     const handleManifestReality = async () => {
         setIsManifesting(true);
         setStatus("MANIFESTING REALITY PROTOCOL INITIATED...");
 
-        // Use default API browser agent to find a texture generator or just simulate for now
-        // Simulating the effect by creating a glitch texture
-
         setTimeout(() => {
-            // Logic to swap texture would go here
             if (containerRef.current && containerRef.current.userData) {
-                const { wallMaterial, floorMaterial, textureLoader } = containerRef.current.userData;
+                const { wallMaterial, floorMaterial } = containerRef.current.userData;
 
-                // Load a 'distressed' version locally or procedurally
-                // For this demo, we shift colors
-                wallMaterial.color.setHex(0xff0000); // Turn walls red
-                floorMaterial.color.setHex(0x330000);
-                setStatus("REALITY REWRITTEN. ANOMALY DETECTED.");
+                // Instead of red, we go for "Rotting/Damp"
+                // Increase roughness to look like wet plaster or mold
+                wallMaterial.roughness = 0.1; // Wet look
+                wallMaterial.metalness = 0.6; // Slightly metallic/slick
+                wallMaterial.color.setHex(0x888866); // Sickly Greenish-Beige
+
+                floorMaterial.roughness = 0.05; // Very wet floor
+                floorMaterial.color.setHex(0x222211); // Dark swampy color
+
+                // Add fog density for atmosphere
+                // Note: We'd need to access scene.fog to change it, assuming it's accessible or we stored it.
+                // For now, these material changes give a "slick" horror look.
+
+                setStatus("REALITY SHIFTED: DECAY PARAMETER 99%");
             }
             setIsManifesting(false);
         }, 2000);
@@ -579,7 +753,7 @@ const BackroomsView = ({ onExit }) => {
             <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-white/50 rounded-full pointer-events-none mix-blend-exclusion" />
 
             {/* CRT Scanline Overlay */}
-            <div className="absolute inset-0 bg-transparent pointer-events-none bg-[url('https://media.istockphoto.com/id/175429679/photo/static.jpg?s=612x612&w=0&k=20&c=L_dUE8q1FhD0dCsqq3qD-L3q0q_s7a5jA8d8k5hF8u4=')] opacity-[0.03] mix-blend-overlay animate-flicker z-40"></div>
+            <div className="absolute inset-0 bg-transparent pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=')] opacity-[0.1] mix-blend-overlay animate-flicker z-40"></div>
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20 pointer-events-none z-40"></div>
         </div>
     );

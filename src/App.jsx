@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Ghost, Eye } from 'lucide-react';
 import BackroomsView from './components/BackroomsView';
 import StoryCard from './components/StoryCard';
 import StoryReader from './components/StoryReader';
 import AdSlot from './components/AdSlot';
-import { STORIES } from './data/stories';
+// Stories defined inline below
 
 // Assume STORIES data is imported or defined here. 
 // For this refactor, I'm keeping the data definition here or suggesting moving it to data/stories.js if it existed.
@@ -13,16 +13,16 @@ import { STORIES } from './data/stories';
 // For now, I will include the STORIES array in this file as it was before, but compacted.
 
 const STORIES_DATA = [
-    {
-        id: 'backrooms',
-        title: 'Level 0: The Beige Eternity',
-        author: 'Surveyor K. Miller',
-        date: 'RECOVERED LOG',
-        is3D: true,
-        summary: 'If you aren\'t careful and you noclip out of reality in the wrong areas...',
-        tags: ['interactive', '3d', 'liminal-space'],
-        // Content for 3D view is handled by the component logic, but we keep metadata here
-        content: `
+  {
+    id: 'backrooms',
+    title: 'Level 0: The Beige Eternity',
+    author: 'Surveyor K. Miller',
+    date: 'RECOVERED LOG',
+    is3D: true,
+    summary: 'If you aren\'t careful and you noclip out of reality in the wrong areas...',
+    tags: ['interactive', '3d', 'liminal-space'],
+    // Content for 3D view is handled by the component logic, but we keep metadata here
+    content: `
       <div class="font-mono text-sm border-b border-red-900/30 pb-4 mb-6">
         <p><span class="text-red-500 font-bold">CASE ID:</span> 001-A "THE LOBBY" &nbsp;&nbsp; <span class="text-red-500 font-bold">CLEARANCE:</span> LEVEL 3</p>
         <p><span class="text-red-500 font-bold">SUBJECT:</span> Surveyor K. Miller (M.E.G. Team "Compass")</p>
@@ -70,14 +70,14 @@ const STORIES_DATA = [
         $$ARCHIVAL NOTE: SUBJECT RECLASSIFIED AS "CORRIDOR BIOMASS 409".$$
       </div>
     `
-    },
-    {
-        id: 'fractal-saint',
-        title: 'The Fractal Saint',
-        author: 'Unknown Scribe',
-        date: 'Age of the Gilded Rot',
-        tags: ['dark-fantasy', 'surreal', 'body-horror'],
-        content: `
+  },
+  {
+    id: 'fractal-saint',
+    title: 'The Fractal Saint',
+    author: 'Unknown Scribe',
+    date: 'Age of the Gilded Rot',
+    tags: ['dark-fantasy', 'surreal', 'body-horror'],
+    content: `
       <p>It began not with a curse, but with a diagram. The High Arithmetician, Vaelin, found it etched into the marrow of a dragon's fossilized spine deep within the Sunless Mines. It was a shape that defied the euclidean laws of our soft, rounded world—a recursive impossibility that caused the optic nerve to throb and weep blood just to look upon.</p>
       <p>He called it the "Splintered Angle."</p>
       <p>I served Vaelin tea the morning he solved the final equation. He didn't look at me. He was staring at his own hand, or what used to be his hand. The fingers were no longer fingers. They were... crystalline, but not stone. They were rearranged flesh. The joints had snapped and reset into jagged, recursive patterns. His index finger branched into three smaller fingers, which branched again into nine, infinitely smaller, disappearing into a microscopic, vibrating fuzz of meat-math that hummed with a low, agonizing frequency.</p>
@@ -86,14 +86,14 @@ const STORIES_DATA = [
       <p>I blinded myself that night. It was the only way to stop the logic from taking root. I took the silver letter opener from Vaelin's desk and... well. Darkness is safety. Darkness is unstructured. But I can still hear them. The rhythmic <i>click-clack</i> of their tessellated feet on the stone, like a billion knitting needles. They are building a cathedral of bone and gristle, a monument to the Great Equation, and the air smells of ozone and flayed skin.</p>
       <p>And sometimes, in the silence, I feel my own ribs itching. They are shifting, snapping, trying to align. I trace the bumps of my spine and count them. <i>One, one-two-three, five, eight, thirteen...</i> they are following a sequence I do not want to know, but my marrow is already singing the answer.</p>
     `
-    },
-    {
-        id: 'clockwork-orphanage',
-        title: 'The Clockwork Orphanage',
-        author: 'Silas Vane',
-        date: '1888',
-        tags: ['steampunk', 'industrial-horror'],
-        content: `
+  },
+  {
+    id: 'clockwork-orphanage',
+    title: 'The Clockwork Orphanage',
+    author: 'Silas Vane',
+    date: '1888',
+    tags: ['steampunk', 'industrial-horror'],
+    content: `
       <p>The St. Jude’s Orphanage for the Mechanical Foundling towers over the smog-choked streets of London, a monolith of soot, iron, and the muffled screams of the "unoptimized." The Matron says we are lucky. She says flesh is a wet, rotting mistake—a temporary cage—but brass is eternal.</p>
       <p>I watched little Timmy go into the "Adjustment Room" yesterday. He was crying because he scraped his knee on the cobblestones. The Matron merely smiled, her teeth clicking like ceramic tiles in a windstorm. When he came out hours later, he didn't cry. He didn't even breathe. His knee was gone, replaced by a beautiful, shiny piston that hissed with scalding steam. But it wasn't just his knee. His eyes were brass orbs that spun independently, and his skin had been stretched so tight over a metal frame that it looked like translucent parchment.</p>
       <p>They take us one by one. I am hiding in the coal chute now, the dust clogging my lungs, but I can hear the grinding below. It is the sound of the Great Furnace, a belly of fire that smells of burning hair, rancid oil, and the copper tang of discarded blood. It never stops hungry.</p>
@@ -101,14 +101,14 @@ const STORIES_DATA = [
       <p>"Come out, child," she calls, her voice the sound of grinding gears crushing gravel. "We have a new heart for you. A heart that will never break, never ache, never flutter. A heart that ticks in perfect time with the factory. You will never feel the cold again, because you will have no nerves to feel it with."</p>
       <p>I look at my own hands. They are trembling, but there is a strange, rhythmic pressure building behind my ribs. It isn't a pulse. It’s a winding sensation. <i>Tick. Tick. Tick.</i></p>
     `
-    },
-    {
-        id: 'whispering-fungus',
-        title: 'The Mycelium Confessional',
-        author: 'Emilio H. Ortiz III',
-        date: '01/24/2026',
-        tags: ['sci-fi', 'psychological', 'body-horror'],
-        content: `
+  },
+  {
+    id: 'whispering-fungus',
+    title: 'The Mycelium Confessional',
+    author: 'Emilio H. Ortiz III',
+    date: '01/24/2026',
+    tags: ['sci-fi', 'psychological', 'body-horror'],
+    content: `
       <div class="font-mono text-sm border-b border-red-900/30 pb-4 mb-6">
         <p><span class="text-red-500 font-bold">CASE ID:</span> 6F5TTTCR1 &nbsp;&nbsp; <span class="text-red-500 font-bold">CLEARANCE:</span> LEVEL 4 (EYES ONLY)</p>
         <p><span class="text-red-500 font-bold">SUBJECT:</span> Dr. Aris Thorne (Primary Vector / Sample 89-B)</p>
@@ -235,80 +235,80 @@ const STORIES_DATA = [
         $$ARCHIVAL NOTE: NO BIOLOGICAL SAMPLES RECOVERED. AREA 01-64 NOW CONSISTS ENTIRELY OF CALCIFIED AMBER STRUCTURES.$$
       </div>
     `
-    }
+  }
 ];
 
 // --- Main App Component ---
 export default function App() {
-    const [activeId, setActiveId] = useState(null);
-    const [sanityState, setSanityState] = useState(100);
+  const [activeId, setActiveId] = useState(null);
+  const [sanityState, setSanityState] = useState(100);
 
-    const activeStory = STORIES_DATA.find(s => s.id === activeId);
+  const activeStory = STORIES_DATA.find(s => s.id === activeId);
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setSanityState(s => Math.max(80, s - 0.01));
-        }, 1000);
-        return () => clearInterval(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSanityState(s => Math.max(80, s - 0.01));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-    // 3D View (Backrooms)
-    if (activeStory?.is3D) {
-        return <BackroomsView onExit={() => setActiveId(null)} />;
-    }
+  // 3D View (Backrooms)
+  if (activeStory?.is3D) {
+    return <BackroomsView onExit={() => setActiveId(null)} />;
+  }
 
-    // Story Reader View
-    if (activeStory && !activeStory.is3D) {
-        return <StoryReader story={activeStory} onBack={() => setActiveId(null)} />;
-    }
+  // Story Reader View
+  if (activeStory && !activeStory.is3D) {
+    return <StoryReader story={activeStory} onBack={() => setActiveId(null)} />;
+  }
 
-    // Gallery View (Home)
-    return (
-        <div className={`min-h-screen bg-[#050505] text-gray-300 font-serif selection:bg-red-900 selection:text-white transition-all duration-1000 ${sanityState < 90 ? 'animate-vibrate' : ''}`}>
+  // Gallery View (Home)
+  return (
+    <div className={`min-h-screen bg-[#050505] text-gray-300 font-serif selection:bg-red-900 selection:text-white transition-all duration-1000 ${sanityState < 90 ? 'animate-vibrate' : ''}`}>
 
-            <nav className="fixed top-0 left-0 w-full bg-black/90 border-b border-red-900/30 backdrop-blur-md z-40 p-4 flex justify-between items-center px-8">
-                <div className="flex items-center gap-3">
-                    <Ghost className="text-red-600 w-8 h-8 animate-pulse" />
-                    <h1 className="text-2xl font-black uppercase tracking-tighter text-red-600 font-header">The Void Archive</h1>
-                </div>
-                <div className="flex gap-6 text-sm uppercase tracking-widest text-gray-500 font-sans items-center">
-                    <a href="https://elo2026.gumroad.com/l/eircyr" target="_blank" rel="noopener noreferrer" className="text-red-600 font-bold border border-red-900/50 px-3 py-1 hover:bg-red-900/20 hover:text-red-400 transition-all animate-pulse">
-                        Subscribe
-                    </a>
-                    <span className="hover:text-red-500 cursor-pointer transition-colors">Documents</span>
-                    <span className="hover:text-red-500 cursor-pointer transition-colors">Surveillance</span>
-                    <span className="hover:text-red-500 cursor-pointer transition-colors">Decrypt</span>
-                </div>
-            </nav>
+      <nav className="fixed top-0 left-0 w-full bg-black/90 border-b border-red-900/30 backdrop-blur-md z-40 p-4 flex justify-between items-center px-8">
+        <div className="flex items-center gap-3">
+          <Ghost className="text-red-600 w-8 h-8 animate-pulse" />
+          <h1 className="text-2xl font-black uppercase tracking-tighter text-red-600 font-header">The Void Archive</h1>
+        </div>
+        <div className="flex gap-6 text-sm uppercase tracking-widest text-gray-500 font-sans items-center">
+          <a href="https://elo2026.gumroad.com/l/eircyr" target="_blank" rel="noopener noreferrer" className="text-red-600 font-bold border border-red-900/50 px-3 py-1 hover:bg-red-900/20 hover:text-red-400 transition-all animate-pulse">
+            Subscribe
+          </a>
+          <span className="hover:text-red-500 cursor-pointer transition-colors">Documents</span>
+          <span className="hover:text-red-500 cursor-pointer transition-colors">Surveillance</span>
+          <span className="hover:text-red-500 cursor-pointer transition-colors">Decrypt</span>
+        </div>
+      </nav>
 
-            <main className="pt-24 pb-20 max-w-5xl mx-auto px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="col-span-full mb-8">
-                        <h3 className="text-red-700 font-sans uppercase tracking-[0.4em] text-xs font-bold mb-4">Latest Classified Data</h3>
-                        <p className="text-gray-500 italic max-w-xl">"Reality is a thin layer of ice over a very deep, dark ocean. These stories are the cracks."</p>
-                    </div>
+      <main className="pt-24 pb-20 max-w-5xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="col-span-full mb-8">
+            <h3 className="text-red-700 font-sans uppercase tracking-[0.4em] text-xs font-bold mb-4">Latest Classified Data</h3>
+            <p className="text-gray-500 italic max-w-xl">"Reality is a thin layer of ice over a very deep, dark ocean. These stories are the cracks."</p>
+          </div>
 
-                    {STORIES_DATA.map(story => (
-                        <StoryCard key={story.id} story={story} onClick={() => setActiveId(story.id)} />
-                    ))}
+          {STORIES_DATA.map(story => (
+            <StoryCard key={story.id} story={story} onClick={() => setActiveId(story.id)} />
+          ))}
 
-                    <AdSlot className="col-span-full mt-12 mb-8" />
-                </div>
-            </main>
+          <AdSlot className="col-span-full mt-12 mb-8" />
+        </div>
+      </main>
 
-            <div className="fixed bottom-6 right-6 flex items-center gap-4 bg-black/80 border border-gray-800 p-3 backdrop-blur-sm">
-                <div className="text-right">
-                    <p className="text-[10px] text-gray-600 font-sans uppercase font-bold">Local Reality Level</p>
-                    <p className="font-mono text-red-600 text-sm">{(sanityState).toFixed(4)}%</p>
-                </div>
-                <div className="w-12 h-12 rounded-full border-2 border-red-900 flex items-center justify-center relative">
-                    <div className="absolute inset-1 rounded-full border border-red-600 animate-ping opacity-20" />
-                    <Eye className="w-5 h-5 text-red-600" />
-                </div>
-            </div>
+      <div className="fixed bottom-6 right-6 flex items-center gap-4 bg-black/80 border border-gray-800 p-3 backdrop-blur-sm">
+        <div className="text-right">
+          <p className="text-[10px] text-gray-600 font-sans uppercase font-bold">Local Reality Level</p>
+          <p className="font-mono text-red-600 text-sm">{(sanityState).toFixed(4)}%</p>
+        </div>
+        <div className="w-12 h-12 rounded-full border-2 border-red-900 flex items-center justify-center relative">
+          <div className="absolute inset-1 rounded-full border border-red-600 animate-ping opacity-20" />
+          <Eye className="w-5 h-5 text-red-600" />
+        </div>
+      </div>
 
-            <style dangerouslySetInnerHTML={{
-                __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes vibrate {
           0% { transform: translate(0,0); }
           25% { transform: translate(1px, -1px); }
@@ -341,6 +341,6 @@ export default function App() {
         .animate-fade-in { animation: fade-in 1s ease-out forwards; }
         .animate-scale-in { animation: scale-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
       `}} />
-        </div>
-    );
+    </div>
+  );
 }
