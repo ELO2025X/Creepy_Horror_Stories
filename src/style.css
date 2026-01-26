@@ -6,6 +6,13 @@
   --color-accent: #8a0303;
 }
 
+body {
+  background-color: #050505;
+  color: #d1d5db;
+  /* gray-300 */
+  font-family: 'Roboto Slab', serif;
+}
+
 
 /* Lightbox */
 #lightbox {
