@@ -40,8 +40,8 @@ export default function App() {
           <h1 className="text-2xl font-black uppercase tracking-tighter text-red-600 font-header">The Void Archive</h1>
         </div>
         <div className="flex gap-6 text-sm uppercase tracking-widest text-gray-500 font-sans items-center">
-          <a href="http://localhost:8080/Forensics/" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 cursor-pointer transition-colors border-b border-transparent hover:border-red-600">FORENSICS</a>
-          <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 cursor-pointer transition-colors border-b border-transparent hover:border-red-600">MARKETING</a>
+          <a href="https://elo2026x.github.io/" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 cursor-pointer transition-colors border-b border-transparent hover:border-red-600">FORENSICS</a>
+          <a href="https://elo2026x.github.io/" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 cursor-pointer transition-colors border-b border-transparent hover:border-red-600">MARKETING</a>
           <a href="https://elo2026.gumroad.com/l/eircyr" target="_blank" rel="noopener noreferrer" className="text-red-600 font-bold border border-red-900/50 px-3 py-1 hover:bg-red-900/20 hover:text-red-400 transition-all animate-pulse">
             Subscribe
           </a>
